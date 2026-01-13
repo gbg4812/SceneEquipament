@@ -4,7 +4,7 @@ project(SceneEquipament)
 include(CTest)
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -37,3 +37,5 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(model_tests)
+
+add_executable(playground tests/main.cpp)
