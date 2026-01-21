@@ -4,9 +4,14 @@
 
 namespace gbg {
 
-struct Model {
-    Mesh mesh;
-    Material material;
+class Model {
+   public:
+    Mesh& getMesh() { return _mesh; }
+    Material& getMaterial() { return _material; }
+
+   private:
+    Mesh _mesh;
+    Material _material;
 };
 
 }  // namespace gbg

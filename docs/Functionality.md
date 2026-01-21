@@ -54,3 +54,12 @@ For attributes i will use a variant of vectors.
 - delete attributes
 - delete vertices
 - add vertice to face
+
+## Resources
+
+- Meshes, Materials, Shaders, Textures
+
+Són dades que es comparteixen entre diversos objectes, materials... S'han de
+alocar i desalocar controladament.
+
+Utilitzarem Handles i Pools per allocar-los i referenciar-los.

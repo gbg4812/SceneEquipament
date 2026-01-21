@@ -1,5 +1,4 @@
-
-
+#pragma once
 #include <queue>
 #include <string>
 #include <type_traits>
@@ -7,9 +6,11 @@
 // base class for any resource
 class Resource {
    public:
+    // TODO: rid 0 vol dir que és null
+    Resource() : _rid(0) {};
     Resource(std::string name, uint32_t rid) : _name(name), _rid(rid) {}
 
-    const std::string &getName() const { return _name; }
+    const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
    private:
@@ -37,7 +38,10 @@ class ResourceManager {
                   "The Resource type must be based of Resource");
 
    public:
-    ResourceManager(size_t initial_size) : _resources(initial_size) {}
+    ResourceManager(size_t initial_size = 0) {
+        _resources.reserve(initial_size);
+    }
+
     template <typename... Ts>
     TH create(std::string name, Ts... args) {
         size_t index = _resources.size();
@@ -52,10 +56,10 @@ class ResourceManager {
         _nextid++;
         return h;
     }
-    T &get(const TH &handle) { return _resources[handle.getIndex()]; }
-    const std::vector<T> &getAll() { return _resources; }
+    T& get(const TH& handle) { return _resources[handle.getIndex()]; }
+    const std::vector<T>& getAll() { return _resources; }
     void clear() { _resources.clear(); }
-    void destroy(const TH &handle) { _free_indexes.push(handle.getIndex()); }
+    void destroy(const TH& handle) { _free_indexes.push(handle.getIndex()); }
 
    private:
     std::vector<T> _resources;

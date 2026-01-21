@@ -4,7 +4,7 @@ project(SceneEquipament)
 include(CTest)
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -50,14 +50,15 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-    model_tests
-    tests/model_tests.cpp
+    resource_tests
+    tests/resource_tests.cpp
 )
 
 target_link_libraries(
-    model_tests
+    resource_tests
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
 add_executable(
@@ -73,5 +74,5 @@ target_link_libraries(
 )
 
 include(GoogleTest)
-gtest_discover_tests(model_tests)
+gtest_discover_tests(resource_tests)
 gtest_discover_tests(mesh_tests)
