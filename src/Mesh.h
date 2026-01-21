@@ -20,6 +20,7 @@ using attr_vt_alt = std::variant_alternative_t<to_underlying(I), attr_vt>;
 class Mesh : public Resource {
     std::map<uint, attr_vt> _attributes;
     std::vector<face_t> _faces;
+    size_t _nvertices = 0;
 
     struct _DefaultVertex_V {
         void operator()(float_attr& v) { v.push_back(0); }
@@ -38,10 +39,11 @@ class Mesh : public Resource {
 
     template <AttributeTypes I>
     void createAttribute(uint location) {
-        _attributes.insert({location, attr_vt_alt<I>()});
+        _attributes.insert({location, attr_vt_alt<I>(_nvertices)});
     }
 
     void addVertex() {
+        _nvertices++;
         for (auto& attrb : _attributes) {
             std::visit<void>(_DefaultVertex_V{}, attrb.second);
         }

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <queue>
 #include <string>
 #include <type_traits>

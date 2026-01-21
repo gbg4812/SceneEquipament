@@ -46,7 +46,6 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-
 enable_testing()
 
 add_executable(
@@ -56,6 +55,7 @@ add_executable(
 
 target_link_libraries(
     resource_tests
+    PRIVATE
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
     glm::glm
@@ -68,11 +68,27 @@ add_executable(
 
 target_link_libraries(
     mesh_tests
+    PRIVATE
+    ${CMAKE_PROJECT_NAME}
+    GTest::gtest_main
+    glm::glm
+)
+
+add_executable(
+    material_tests
+    tests/material_tests.cpp
+)
+
+target_link_libraries(
+    material_tests
+    PRIVATE
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
     glm::glm
 )
 
 include(GoogleTest)
+
 gtest_discover_tests(resource_tests)
 gtest_discover_tests(mesh_tests)
+gtest_discover_tests(material_tests)

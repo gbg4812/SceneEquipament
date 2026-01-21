@@ -25,8 +25,8 @@ TEST(resource_tests, create_mesh_resource) {
     auto h1 = mg.create("Mesh1");
     auto h2 = mg.create("Mesh2");
 
-    auto m1 = mg.get(h1);
-    auto m2 = mg.get(h2);
+    Mesh& m1 = mg.get(h1);
+    Mesh& m2 = mg.get(h2);
 
     m1.addVertex();
     m1.addVertex();
