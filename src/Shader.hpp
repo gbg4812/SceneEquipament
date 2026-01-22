@@ -4,15 +4,20 @@
 
 #include "ParameterTypes.hpp"
 #include "Resource.hpp"
+#include "gbg_traits.hpp"
 
 namespace gbg {
 typedef std::variant<float_t, vec2_t, vec3_t> parm_vt;
 
 enum ParameterTypes { FLOAT_PARM = 0, VEC2_PARM, VEC3_PARM };
 
+template <ParameterTypes I>
+using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
+
 class Shader : public Resource {
    public:
     Shader() : Resource() {}
+    Shader(std::string name, uint32_t rid) : Resource(name, rid) {};
     Shader(std::string frag_path, std::string vert_path)
         : Resource(), _frag_path(frag_path), _vert_path(vert_path) {}
     Shader(std::string frag_path, std::string vert_path, std::string name,
@@ -45,6 +50,7 @@ class Shader : public Resource {
 };
 
 class ShaderHandle : public ResourceHandle {
+   public:
     ShaderHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
     ShaderHandle() : ResourceHandle() {}
 };

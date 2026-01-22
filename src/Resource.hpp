@@ -3,6 +3,7 @@
 #include <queue>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 #include <vector>
 // base class for any resource
 class Resource {
@@ -29,6 +30,9 @@ class ResourceHandle {
     ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
+    bool operator==(ResourceHandle& other) {
+        return (other._index == _index) and (other._rid == _rid);
+    }
 };
 
 // Manager class to allocate and get instances of a type of resource
