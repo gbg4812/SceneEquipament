@@ -26,4 +26,5 @@ struct is_variant<std::variant<Ts...>> : std::true_type {};
 
 template <typename T>
 constexpr bool is_variant_v = is_variant<T>::value;
+
 };  // namespace gbg

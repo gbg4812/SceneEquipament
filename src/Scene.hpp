@@ -7,6 +7,7 @@ namespace gbg {
 
 class Scene {
    public:
+    Scene() = default;
     Scene(Scene& other) = delete;
 
     ResourceManager<Mesh, MeshHandle>& getMeshManager() { return _ms_mg; }

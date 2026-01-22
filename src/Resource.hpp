@@ -50,7 +50,6 @@ class ResourceManager {
         _resources.reserve(initial_size);
     }
 
-    template <typename... Ts>
     TH create(std::string name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
