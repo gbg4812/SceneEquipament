@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Mesh.h"
+#include "Mesh.hpp"
 
 TEST(model_tests, attrib_add_get) {
     gbg::Mesh mesh;

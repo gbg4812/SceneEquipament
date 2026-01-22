@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "Material.h"
-#include "Shader.h"
+#include "Material.hpp"
+#include "Shader.hpp"
 
 using namespace gbg;
 

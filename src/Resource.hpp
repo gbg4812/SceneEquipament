@@ -25,6 +25,7 @@ class ResourceHandle {
     size_t _index;
 
    public:
+    ResourceHandle() : _rid(0), _index(0) {}
     ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
@@ -37,6 +38,8 @@ class ResourceManager {
                   "The ResourceHandle type must be based of ResourceHandle");
     static_assert(std::is_base_of_v<Resource, T>,
                   "The Resource type must be based of Resource");
+    static_assert(std::is_constructible_v<T, std::string, uint32_t>,
+                  "The Resource must have this constructor");
 
    public:
     ResourceManager(size_t initial_size = 0) {
@@ -44,19 +47,20 @@ class ResourceManager {
     }
 
     template <typename... Ts>
-    TH create(std::string name, Ts... args) {
+    TH create(std::string name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
-            _resources[_free_indexes.front()] = T(name, _nextid, args...);
+            _resources[_free_indexes.front()] = T(name, _nextid);
             index = _free_indexes.front();
             _free_indexes.pop();
         } else {
-            _resources.push_back(T(name, _nextid, args...));
+            _resources.push_back(T(name, _nextid));
         }
         auto h = TH(_nextid, index);
         _nextid++;
         return h;
     }
+
     T& get(const TH& handle) { return _resources[handle.getIndex()]; }
     const std::vector<T>& getAll() { return _resources; }
     void clear() { _resources.clear(); }
@@ -65,5 +69,5 @@ class ResourceManager {
    private:
     std::vector<T> _resources;
     std::queue<size_t> _free_indexes;
-    uint32_t _nextid;
+    uint32_t _nextid = 0;
 };

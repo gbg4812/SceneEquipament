@@ -16,7 +16,7 @@ elseif( WIN32 )
 endif()
 
 
-file(GLOB SRC src/*.cpp)
+file(GLOB SRC src/*.h)
 
 add_library(${CMAKE_PROJECT_NAME} INTERFACE
     ${SRC}
@@ -26,24 +26,31 @@ add_library(${CMAKE_PROJECT_NAME} INTERFACE
 target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE src/)
 
 FetchContent_Declare(
- glm
- GIT_REPOSITORY	https://github.com/g-truc/glm.git
- GIT_TAG 	a532f5b1cf27d6a3c099437e6959cf7e398a0a67
+    glm
+    GIT_REPOSITORY	https://github.com/g-truc/glm.git
+    GIT_TAG 82f86a8057c169ae0d6c939dfa148970e97d6693
 )
 
-FetchContent_MakeAvailable(glm)
+FetchContent_GetProperties(glm)
+if (NOT glm_POPULATED)
+    FetchContent_Populate(glm)
+    add_library(glm INTERFACE)
+    target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
+endif()
 
 
-target_link_libraries(${CMAKE_PROJECT_NAME} INTERFACE glm::glm)
+target_link_libraries(${CMAKE_PROJECT_NAME} INTERFACE glm)
 
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG 52eb8108c5bdec04579160ae17225d66034bd723
 )
 
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
@@ -58,7 +65,6 @@ target_link_libraries(
     PRIVATE
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
-    glm::glm
 )
 
 add_executable(
@@ -71,7 +77,6 @@ target_link_libraries(
     PRIVATE
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
-    glm::glm
 )
 
 add_executable(
@@ -84,7 +89,6 @@ target_link_libraries(
     PRIVATE
     ${CMAKE_PROJECT_NAME}
     GTest::gtest_main
-    glm::glm
 )
 
 include(GoogleTest)

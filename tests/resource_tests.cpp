@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "AttributeTypes.h"
-#include "Mesh.h"
-#include "Resource.h"
+#include "AttributeTypes.hpp"
+#include "Mesh.hpp"
+#include "Resource.hpp"
 
 using namespace gbg;
 

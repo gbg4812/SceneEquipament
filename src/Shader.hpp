@@ -2,8 +2,8 @@
 
 #include <variant>
 
-#include "ParameterTypes.h"
-#include "Resource.h"
+#include "ParameterTypes.hpp"
+#include "Resource.hpp"
 
 namespace gbg {
 typedef std::variant<float_t, vec2_t, vec3_t> parm_vt;
@@ -43,4 +43,10 @@ class Shader : public Resource {
     std::string _frag_path;
     std::string _vert_path;
 };
+
+class ShaderHandle : public ResourceHandle {
+    ShaderHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
+    ShaderHandle() : ResourceHandle() {}
+};
+
 }  // namespace gbg

@@ -3,9 +3,9 @@
 #include <map>
 #include <variant>
 
-#include "AttributeTypes.h"
-#include "Resource.h"
-#include "gbg_traits.h"
+#include "AttributeTypes.hpp"
+#include "Resource.hpp"
+#include "gbg_traits.hpp"
 
 namespace gbg {
 
