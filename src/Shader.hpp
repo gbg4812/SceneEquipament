@@ -1,5 +1,8 @@
 #pragma once
 
+#include <filesystem>
+#include <fstream>
+#include <istream>
 #include <variant>
 
 #include "ParameterTypes.hpp"
@@ -16,13 +19,7 @@ using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 class Shader : public Resource {
    public:
-    Shader() : Resource() {}
     Shader(std::string name, uint32_t rid) : Resource(name, rid) {};
-    Shader(std::string frag_path, std::string vert_path)
-        : Resource(), _frag_path(frag_path), _vert_path(vert_path) {}
-    Shader(std::string frag_path, std::string vert_path, std::string name,
-           uint32_t rid)
-        : Resource(name, rid), _frag_path(frag_path), _vert_path(vert_path) {}
 
     // returns the position
     size_t addParameter(ParameterTypes I) {
@@ -39,14 +36,36 @@ class Shader : public Resource {
 
     const std::vector<ParameterTypes>& getParameters() { return _parameters; }
 
-    const std::string& getFragShaderPath() { return _frag_path; }
+    void loadFragShaderCode(std::string file_path) {
+        std::ifstream ifs(file_path);
 
-    const std::string& getVertShaderPath() { return _vert_path; }
+        char rdaux[64];
+
+        while (ifs) {
+            ifs.read(rdaux, 64);
+            _frag_code.append(rdaux, ifs.gcount());
+        }
+    }
+
+    void loadVertShaderCode(std::string file_path) {
+        std::ifstream ifs(file_path);
+
+        char rdaux[64];
+
+        while (ifs) {
+            ifs.read(rdaux, 64);
+            _vert_code.append(rdaux, ifs.gcount());
+        }
+    }
+
+    const std::string& getFragShaderCode() { return _frag_code; }
+
+    const std::string& getVertShaderCode() { return _vert_code; }
 
    private:
     std::vector<ParameterTypes> _parameters;
-    std::string _frag_path;
-    std::string _vert_path;
+    std::string _frag_code;
+    std::string _vert_code;
 };
 
 class ShaderHandle : public ResourceHandle {

@@ -1,21 +1,13 @@
 #pragma once
 
-#include <variant>
-
 #include "Resource.hpp"
 #include "Shader.hpp"
 
 namespace gbg {
 
-class Scene;
-
 class Material : public Resource {
    public:
-    Material() : Resource() {}
     Material(std::string name, uint32_t rid) : Resource(name, rid) {}
-    Material(ShaderHandle shader, const Scene& scene) : Resource() {
-        setShader(shader, scene);
-    }
 
     void setShader(ShaderHandle shader, const Scene& scene) {
         ResourceManager<Shader, ShaderHandle>& sm = scene.getShaderManager();
@@ -49,6 +41,9 @@ class Material : public Resource {
     ShaderHandle _shader;
 };
 
-class MaterialHandle : public ResourceHandle {};
+class MaterialHandle : public ResourceHandle {
+   public:
+    MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
+};
 
 }  // namespace gbg

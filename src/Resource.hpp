@@ -26,8 +26,8 @@ class ResourceHandle {
     size_t _index;
 
    public:
-    ResourceHandle() : _rid(0), _index(0) {}
     ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}
+    ResourceHandle() : _rid(0), _index(0) {};
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
     bool operator==(ResourceHandle& other) {
