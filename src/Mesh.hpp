@@ -34,7 +34,7 @@ class Mesh : public Resource {
 
     template <AttributeTypes I>
     attr_vt_alt<I>& getAttribute(uint location) {
-        return std::get<to_underlying(I)>(_attributes[location]);
+        return std::get<to_underlying(I)>(_attributes.at(location));
     }
 
     template <AttributeTypes I>
@@ -56,6 +56,7 @@ class Mesh : public Resource {
 
 class MeshHandle : public ResourceHandle {
    public:
+    MeshHandle() : ResourceHandle() {};
     MeshHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
 };
 

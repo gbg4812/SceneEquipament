@@ -91,8 +91,36 @@ target_link_libraries(
     GTest::gtest_main
 )
 
+add_executable(
+    scene_tests
+    tests/scene_tests.cpp
+)
+
+target_link_libraries(
+    scene_tests
+    PRIVATE
+    ${CMAKE_PROJECT_NAME}
+    GTest::gtest_main
+)
+
+add_executable(
+    loader_tests
+    tests/loader_tests.cpp
+)
+
+target_link_libraries(
+    loader_tests
+    PRIVATE
+    ${CMAKE_PROJECT_NAME}
+    GTest::gtest_main
+)
+
 include(GoogleTest)
 
 gtest_discover_tests(resource_tests)
 gtest_discover_tests(mesh_tests)
 gtest_discover_tests(material_tests)
+gtest_discover_tests(scene_tests)
+gtest_discover_tests(loader_tests)
+
+file(CREATE_LINK ${CMAKE_SOURCE_DIR}/tests/data ${CMAKE_BINARY_DIR}/data SYMBOLIC)

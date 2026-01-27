@@ -3,7 +3,9 @@
 
 #include "Material.hpp"
 #include "Mesh.hpp"
+#include "Model.hpp"
 #include "Scene.hpp"
+#include "SceneTree.hpp"
 #include "Shader.hpp"
 
 using namespace gbg;
@@ -18,7 +20,7 @@ TEST(scene_tests, create_resources) {
     MeshHandle mh2 = msh_mg.create("Mesh2");
 
     auto& mesh = msh_mg.get(mh2);
-    ASSERT_EQ(mesh.getName(), "Mesh1");
+    ASSERT_EQ(mesh.getName(), "Mesh2");
 
     // Shader
     auto& sh_mg = sc.getShaderManager();
@@ -27,7 +29,7 @@ TEST(scene_tests, create_resources) {
     ShaderHandle sh2 = sh_mg.create("Shader2");
 
     auto& shader = sh_mg.get(sh2);
-    ASSERT_EQ(shader.getName(), "Shader1");
+    ASSERT_EQ(shader.getName(), "Shader2");
 
     shader.addParameter(ParameterTypes::FLOAT_PARM);
     shader.addParameter(ParameterTypes::VEC3_PARM);
@@ -37,6 +39,7 @@ TEST(scene_tests, create_resources) {
 
     MaterialHandle mth1 = mt_mg.create("Material");
     Material& mt = mt_mg.get(mth1);
+    mt.setParameters(shader.getParameters());
 
     auto& vals = mt.getValues();
 
@@ -45,4 +48,23 @@ TEST(scene_tests, create_resources) {
         ASSERT_EQ(parmt, it->index());
         it++;
     }
+}
+
+TEST(scene_tests, scene_tree) {
+    Scene sc;
+    auto& md_mg = sc.getModelManager();
+    ModelHandle mdl = md_mg.create("Model1");
+    ModelHandle mdl2 = md_mg.create("Model2");
+
+    SceneTree* root = new SceneTree();
+
+    root->setSceneObjectHandle<SceneObjectTypes::MODEL>(mdl);
+    root->addChild<SceneObjectTypes::MODEL>(mdl2);
+
+    ASSERT_EQ(mdl, root->getHandle<SceneObjectTypes::MODEL>());
+    ASSERT_EQ(
+        mdl2,
+        root->getChildren().front()->getHandle<SceneObjectTypes::MODEL>());
+
+    ASSERT_EQ(SceneObjectTypes::MODEL, root->getType());
 }

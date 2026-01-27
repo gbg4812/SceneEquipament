@@ -30,7 +30,8 @@ class ResourceHandle {
     ResourceHandle() : _rid(0), _index(0) {};
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
-    bool operator==(ResourceHandle& other) {
+    bool empty() { return _rid == 0; }
+    bool operator==(const ResourceHandle& other) const {
         return (other._index == _index) and (other._rid == _rid);
     }
 };
@@ -65,12 +66,13 @@ class ResourceManager {
     }
 
     T& get(const TH& handle) { return _resources[handle.getIndex()]; }
-    const std::vector<T>& getAll() { return _resources; }
+    std::vector<T>& getAll() { return _resources; }
     void clear() { _resources.clear(); }
     void destroy(const TH& handle) { _free_indexes.push(handle.getIndex()); }
 
    private:
     std::vector<T> _resources;
     std::queue<size_t> _free_indexes;
-    uint32_t _nextid = 0;
+    // 0 is reserved
+    uint32_t _nextid = 1;
 };

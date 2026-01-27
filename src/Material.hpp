@@ -9,13 +9,11 @@ class Material : public Resource {
    public:
     Material(std::string name, uint32_t rid) : Resource(name, rid) {}
 
-    void setShader(ShaderHandle shader, const Scene& scene) {
-        ResourceManager<Shader, ShaderHandle>& sm = scene.getShaderManager();
-        Shader& sh = sm.get(shader);
+    void setParameters(const std::vector<ParameterTypes>& parameters) {
         _parameters.clear();
 
         // TODO: centralize defaults
-        for (ParameterTypes parmT : sh.getParameters()) {
+        for (ParameterTypes parmT : parameters) {
             switch (parmT) {
                 case FLOAT_PARM:
                     _parameters.push_back(0.0f);
@@ -26,7 +24,6 @@ class Material : public Resource {
                     _parameters.push_back(glm::vec3());
             }
         }
-        _shader = shader;
     }
 
     template <ParameterTypes I>
@@ -38,11 +35,11 @@ class Material : public Resource {
 
    private:
     std::vector<parm_vt> _parameters;
-    ShaderHandle _shader;
 };
 
 class MaterialHandle : public ResourceHandle {
    public:
+    MaterialHandle() : ResourceHandle() {};
     MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
 };
 
