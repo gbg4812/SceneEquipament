@@ -16,14 +16,14 @@ elseif( WIN32 )
 endif()
 
 
-file(GLOB SRC src/*.h)
+file(GLOB SRC src/*.hpp)
 
 add_library(${PROJECT_NAME} INTERFACE
     ${SRC}
 )
 
-
 target_include_directories(${PROJECT_NAME} INTERFACE src/)
+
 
 FetchContent_Declare(
     glm
