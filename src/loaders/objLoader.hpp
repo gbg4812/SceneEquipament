@@ -40,7 +40,7 @@ inline void parseFace(const std::string& line, Mesh& mesh) {
 inline bool objLoader(std::string path, Scene& scene, SceneTree* parent) {
     std::map<std::string, void (*)(const std::string&, Mesh&)> dispatch;
     dispatch["v"] = parseVertexPos;
-    dispatch["f"] = parseVertexPos;
+    dispatch["f"] = parseFace;
 
     std::ifstream fs(path);
     if (fs.fail()) return false;

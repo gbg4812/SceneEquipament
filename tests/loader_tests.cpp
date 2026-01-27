@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "Mesh.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "loaders/objLoader.hpp"
 
@@ -20,8 +21,15 @@ TEST(loader_tests, loader_load) {
     SceneTree tree;
     objLoader("./data/Cube.obj", sc, &tree);
 
-    std::cout << sc.getMeshManager()
-                     .getAll()[0]
-                     .getAttribute<AttributeTypes::VEC3_ATTR>(0)
-              << std::endl;
+    auto& md_mg = sc.getModelManager();
+    auto& ms_mg = sc.getMeshManager();
+
+    ASSERT_EQ(md_mg.getAll()[0].getName(), "Cube");
+
+    ASSERT_EQ(md_mg.getAll()[0].getMesh().getRID(), ms_mg.getAll()[0].getRID());
+
+    ASSERT_EQ(ms_mg.getAll()[0]
+                  .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
+                  .size(),
+              8);
 }

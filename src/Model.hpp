@@ -5,7 +5,7 @@
 
 namespace gbg {
 
-class Model : Resource {
+class Model : public Resource {
    public:
     Model(std::string name, uint32_t rid) : Resource(name, rid) {};
 
