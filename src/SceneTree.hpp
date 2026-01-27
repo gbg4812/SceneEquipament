@@ -2,6 +2,7 @@
 #include <list>
 #include <variant>
 
+#include "DepDataHandle.hpp"
 #include "Model.hpp"
 #include "glm/glm.hpp"
 
@@ -12,6 +13,10 @@ enum SceneObjectTypes {
     MODEL = 1,
 };
 
+enum ObjectFlags {
+    DIRTY = 0x01,
+};
+
 typedef std::variant<std::monostate, ModelHandle> scene_obj_vt;
 
 template <SceneObjectTypes I>
@@ -20,6 +25,12 @@ using scene_obj_alt =
 
 class SceneTree {
    public:
+    ~SceneTree() {
+        for (SceneTree* child : _children) {
+            delete child;
+        }
+    }
+
     const std::list<SceneTree*>& getChildren() { return _children; }
     SceneTree* getParent() { return _parent; }
     const glm::mat4x4& getLocalTransform() { return _transform; }
@@ -35,9 +46,11 @@ class SceneTree {
     void setSceneObjectHandle(scene_obj_alt<I> object) {
         _resource = object;
     }
+
     void multiplyLocalTransform(const glm::mat4x4& transform) {
         _transform = _transform * transform;
     }
+
     glm::mat4x4 computeTransform() {
         if (_parent) return _parent->computeTransform() * _transform;
         return _transform;
@@ -61,11 +74,15 @@ class SceneTree {
         _parent = parent;
     }
 
+    void setFlags(ObjectFlags flags) { _handle.flags = flags; }
+    DepDataHandle getHandle() { return _handle; }
+
    private:
     SceneTree* _parent = nullptr;
     std::list<SceneTree*> _children;
     glm::mat4x4 _transform;
     scene_obj_vt _resource;
+    DepDataHandle _handle;
 };
 
 }  // namespace gbg
