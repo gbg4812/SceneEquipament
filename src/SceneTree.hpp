@@ -38,9 +38,11 @@ class SceneTree {
     SceneObjectTypes getType() { return (SceneObjectTypes)_resource.index(); }
 
     template <SceneObjectTypes I>
-    scene_obj_alt<I> getHandle() {
+    scene_obj_alt<I> getResourceHandle() {
         return std::get<I>(_resource);
     }
+
+    const scene_obj_vt& getResourceHandle() { return _resource; }
 
     template <SceneObjectTypes I>
     void setSceneObjectHandle(scene_obj_alt<I> object) {
@@ -75,7 +77,7 @@ class SceneTree {
     }
 
     void setFlags(ObjectFlags flags) { _handle.flags = flags; }
-    DepDataHandle getHandle() { return _handle; }
+    DepDataHandle getDepDataHandle() { return _handle; }
 
    private:
     SceneTree* _parent = nullptr;

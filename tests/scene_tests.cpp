@@ -61,10 +61,10 @@ TEST(scene_tests, scene_tree) {
     root->setSceneObjectHandle<SceneObjectTypes::MODEL>(mdl);
     root->addChild<SceneObjectTypes::MODEL>(mdl2);
 
-    ASSERT_EQ(mdl, root->getHandle<SceneObjectTypes::MODEL>());
-    ASSERT_EQ(
-        mdl2,
-        root->getChildren().front()->getHandle<SceneObjectTypes::MODEL>());
+    ASSERT_EQ(mdl, root->getResourceHandle<SceneObjectTypes::MODEL>());
+    ASSERT_EQ(mdl2, root->getChildren()
+                        .front()
+                        ->getResourceHandle<SceneObjectTypes::MODEL>());
 
     ASSERT_EQ(SceneObjectTypes::MODEL, root->getType());
 }
