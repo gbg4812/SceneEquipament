@@ -6,9 +6,9 @@
 #include <sstream>
 #include <string>
 
+#include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
-#include "Model.hpp"
 #include "glm/glm.hpp"
 
 namespace gbg {
