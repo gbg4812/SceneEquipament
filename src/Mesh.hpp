@@ -49,6 +49,8 @@ class Mesh : public Resource {
         }
     }
 
+    const std::map<uint, attr_vt>& getAttributes() { return _attributes; }
+
     void createFace(std::list<uint> vertices) { _faces.push_back(vertices); }
 
     std::vector<face_t>& getFaces() { return _faces; }
