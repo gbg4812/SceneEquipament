@@ -17,6 +17,7 @@ enum SceneObjectTypes {
 
 enum ObjectFlags {
     DIRTY = 0x01,
+    INVISIBLE,
 };
 
 typedef std::variant<std::monostate, ModelHandle> scene_obj_vt;
@@ -79,7 +80,8 @@ class SceneTree {
     }
 
     void setFlags(ObjectFlags flags) { _handle.flags = flags; }
-    DepDataHandle getDepDataHandle() { return _handle; }
+    DepDataHandle getDepDataHandle() const { return _handle; }
+    void setDepDataHandle(DepDataHandle h) { _handle = h; }
 
    private:
     SceneTree* _parent = nullptr;
