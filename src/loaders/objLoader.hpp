@@ -32,7 +32,7 @@ inline void parseFace(const std::string& line, Mesh& mesh) {
     for (std::sregex_iterator it(line.begin(), line.end(), posnbs);
          it != std::sregex_iterator{}; ++it) {
         std::cout << (*it)[1] << std::endl;
-        face.push_back(std::stoul((*it)[1]));
+        face.push_back(std::stoul((*it)[1]) - 1);
     }
 
     mesh.createFace(face);
