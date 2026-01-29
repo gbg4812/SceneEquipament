@@ -60,6 +60,7 @@ inline bool objLoader(std::string path, Scene& scene, SceneTree* parent) {
             std::string name;
             ss >> name;
             mdh = md_mg.create(name);
+            parent->addChild<gbg::SceneObjectTypes::MODEL>(mdh);
             msh = ms_mg.create("Mesh0");
 
             md_mg.get(mdh).setMesh(msh);
