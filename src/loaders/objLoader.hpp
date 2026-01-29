@@ -9,7 +9,6 @@
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
-#include "glm/glm.hpp"
 
 namespace gbg {
 

@@ -3,8 +3,8 @@
 #include <queue>
 #include <string>
 #include <type_traits>
-#include <typeinfo>
 #include <vector>
+
 // base class for any resource
 class Resource {
    public:

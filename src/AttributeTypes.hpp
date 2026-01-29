@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 
-#include "glm/glm.hpp"
+#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
 
 namespace gbg {
 

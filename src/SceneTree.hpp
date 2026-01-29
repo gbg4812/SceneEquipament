@@ -6,7 +6,6 @@
 
 #include "DepDataHandle.hpp"
 #include "Model.hpp"
-#include "glm/glm.hpp"
 
 namespace gbg {
 

@@ -28,18 +28,12 @@ target_include_directories(${PROJECT_NAME} INTERFACE src/)
 FetchContent_Declare(
     glm
     GIT_REPOSITORY	https://github.com/g-truc/glm.git
-    GIT_TAG 82f86a8057c169ae0d6c939dfa148970e97d6693
+    GIT_TAG 8d1fd52e5ab5590e2c81768ace50c72bae28f2ed
 )
 
-FetchContent_GetProperties(glm)
-if (NOT glm_POPULATED)
-    FetchContent_Populate(glm)
-    add_library(glm INTERFACE)
-    target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
-endif()
+FetchContent_MakeAvailable(glm)
 
-
-target_link_libraries(${PROJECT_NAME} INTERFACE glm)
+target_link_libraries(${PROJECT_NAME} INTERFACE glm::glm)
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 
@@ -67,6 +61,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     PRIVATE
     ${PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
     add_executable(
@@ -79,6 +74,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     PRIVATE
     ${PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
     add_executable(
@@ -91,6 +87,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     PRIVATE
     ${PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
     add_executable(
@@ -103,6 +100,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     PRIVATE
     ${PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
     add_executable(
@@ -115,6 +113,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     PRIVATE
     ${PROJECT_NAME}
     GTest::gtest_main
+    glm::glm
 )
 
     include(GoogleTest)
