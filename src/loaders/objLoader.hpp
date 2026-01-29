@@ -2,6 +2,8 @@
 #include <sys/types.h>
 
 #include <fstream>
+#include <iostream>
+#include <ostream>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -23,13 +25,13 @@ inline void parseVertexPos(const std::string& line, Mesh& mesh) {
 }
 
 inline void parseFace(const std::string& line, Mesh& mesh) {
-    std::regex posnbs(R"(f\s+(\d+)/)");
-    std::smatch result;
+    std::regex posnbs(R"(\s+(\d+)/)");
 
     face_t face;
 
     for (std::sregex_iterator it(line.begin(), line.end(), posnbs);
          it != std::sregex_iterator{}; ++it) {
+        std::cout << (*it)[1] << std::endl;
         face.push_back(std::stoul((*it)[1]));
     }
 

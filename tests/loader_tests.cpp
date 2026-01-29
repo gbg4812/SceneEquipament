@@ -7,11 +7,31 @@
 
 using namespace gbg;
 
+std::ostream& operator<<(std::ostream& os, const glm::vec3 vec) {
+    os << "(" << vec.x << "," << vec.y << "," << vec.z << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const glm::vec2 vec) {
+    os << "(" << vec.x << "," << vec.y << ")";
+    return os;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::list<T>& vec) {
+    os << "[";
+    for (const T& el : vec) {
+        os << el << ", ";
+    }
+    os << "]" << std::endl;
+    return os;
+}
+
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
     os << "(";
     for (const T& el : vec) {
-        os << glm::to_string(el) << ", ";
+        os << el << ", ";
     }
     os << ")" << std::endl;
     return os;
@@ -33,4 +53,6 @@ TEST(loader_tests, loader_load) {
                   .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
                   .size(),
               8);
+
+    std::cout << ms_mg.getAll()[0].getFaces() << std::endl;
 }
