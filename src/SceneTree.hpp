@@ -4,7 +4,6 @@
 #include <list>
 #include <variant>
 
-#include "DepDataHandle.hpp"
 #include "Model.hpp"
 
 namespace gbg {
@@ -12,11 +11,6 @@ namespace gbg {
 enum SceneObjectTypes {
     EMPTY = 0,
     MODEL = 1,
-};
-
-enum ObjectFlags {
-    DIRTY = 0x01,
-    INVISIBLE,
 };
 
 typedef std::variant<std::monostate, ModelHandle> scene_obj_vt;
@@ -78,16 +72,11 @@ class SceneTree {
         _parent = parent;
     }
 
-    void setFlags(ObjectFlags flags) { _handle.flags = flags; }
-    DepDataHandle getDepDataHandle() const { return _handle; }
-    void setDepDataHandle(DepDataHandle h) { _handle = h; }
-
    private:
     SceneTree* _parent = nullptr;
     std::list<SceneTree*> _children;
     glm::mat4x4 _transform;
     scene_obj_vt _resource;
-    DepDataHandle _handle;
 };
 
 }  // namespace gbg

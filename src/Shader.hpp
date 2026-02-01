@@ -1,10 +1,9 @@
 #pragma once
 
-#include <filesystem>
 #include <fstream>
-#include <istream>
 #include <variant>
 
+#include "Mesh.hpp"
 #include "ParameterTypes.hpp"
 #include "Resource.hpp"
 #include "gbg_traits.hpp"
@@ -27,14 +26,27 @@ class Shader : public Resource {
         return _parameters.size() - 1;
     };
 
+    size_t addAttribute(uint loc, AttributeTypes I) {
+        _attributes.emplace(loc, I);
+        return _attributes.size() - 1;
+    };
+
     void removeParameter(size_t pos) {
         auto it = _parameters.begin();
-        for (int i = 0; i < pos; ++i, ++it) {
+        for (size_t i = 0; i < pos; ++i, ++it) {
             _parameters.erase(it, it);
         }
     }
 
-    const std::vector<ParameterTypes>& getParameters() { return _parameters; }
+    void removeAttribute(uint loc) { _attributes.erase(loc); }
+
+    const std::vector<ParameterTypes>& getParameters() const {
+        return _parameters;
+    }
+
+    const std::map<uint, AttributeTypes>& getAttributes() const {
+        return _attributes;
+    }
 
     void loadFragShaderCode(std::string file_path) {
         std::ifstream ifs(file_path);
@@ -58,12 +70,13 @@ class Shader : public Resource {
         }
     }
 
-    const std::string& getFragShaderCode() { return _frag_code; }
+    const std::string& getFragShaderCode() const { return _frag_code; }
 
-    const std::string& getVertShaderCode() { return _vert_code; }
+    const std::string& getVertShaderCode() const { return _vert_code; }
 
    private:
     std::vector<ParameterTypes> _parameters;
+    std::map<uint, AttributeTypes> _attributes;
     std::string _frag_code;
     std::string _vert_code;
 };

@@ -39,7 +39,7 @@ TEST(scene_tests, create_resources) {
 
     MaterialHandle mth1 = mt_mg.create("Material");
     Material& mt = mt_mg.get(mth1);
-    mt.setParameters(shader.getParameters());
+    mt.setShader(sh2, shader);
 
     auto& vals = mt.getValues();
 

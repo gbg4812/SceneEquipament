@@ -38,7 +38,8 @@ inline void parseFace(const std::string& line, Mesh& mesh) {
     mesh.createFace(face);
 }
 
-inline bool objLoader(std::string path, Scene& scene, SceneTree* parent) {
+inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
+                      MaterialHandle default_mat) {
     std::map<std::string, void (*)(const std::string&, Mesh&)> dispatch;
     dispatch["v"] = parseVertexPos;
     dispatch["f"] = parseFace;
@@ -46,8 +47,8 @@ inline bool objLoader(std::string path, Scene& scene, SceneTree* parent) {
     std::ifstream fs(path);
     if (fs.fail()) return false;
 
-    auto& md_mg = scene.getModelManager();
-    auto& ms_mg = scene.getMeshManager();
+    auto& md_mg = scene->getModelManager();
+    auto& ms_mg = scene->getMeshManager();
 
     ModelHandle mdh;
     MeshHandle msh;
@@ -66,6 +67,7 @@ inline bool objLoader(std::string path, Scene& scene, SceneTree* parent) {
             msh = ms_mg.create("Mesh0");
 
             md_mg.get(mdh).setMesh(msh);
+            md_mg.get(mdh).setMaterial(default_mat);
             Mesh& msh_i = ms_mg.get(msh);
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
 

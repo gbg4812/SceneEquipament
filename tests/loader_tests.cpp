@@ -40,14 +40,19 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
 TEST(loader_tests, loader_load) {
     Scene sc;
     SceneTree tree;
-    objLoader("./data/Cube.obj", sc, &tree);
 
+    auto& mt_mg = sc.getMaterialManager();
     auto& md_mg = sc.getModelManager();
     auto& ms_mg = sc.getMeshManager();
+
+    auto mth = mt_mg.create("Default Material");
+
+    objLoader("./data/Cube.obj", &sc, &tree, mth);
 
     ASSERT_EQ(md_mg.getAll()[0].getName(), "Cube");
 
     ASSERT_EQ(md_mg.getAll()[0].getMesh().getRID(), ms_mg.getAll()[0].getRID());
+    ASSERT_EQ(md_mg.getAll()[0].getMaterial().getRID(), mth.getRID());
 
     ASSERT_EQ(ms_mg.getAll()[0]
                   .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)

@@ -5,6 +5,15 @@
 #include <type_traits>
 #include <vector>
 
+#include "DepDataHandle.hpp"
+
+namespace gbg {
+
+enum ResourceFlags {
+    DIRTY = 0x01,
+    INVISIBLE,
+};
+
 // base class for any resource
 class Resource {
    public:
@@ -15,9 +24,14 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
+    DepDataHandle getDepDataHandle() const { return _handle; }
+    void setDepDataHandle(DepDataHandle h) { _handle = h; }
+    void setDepDataFlags(ResourceFlags flags) { _handle.flags = flags; }
+
    private:
     std::string _name;
     uint32_t _rid;
+    DepDataHandle _handle;
 };
 
 // identifies a resource
@@ -76,3 +90,5 @@ class ResourceManager {
     // 0 is reserved
     uint32_t _nextid = 1;
 };
+
+}  // namespace gbg

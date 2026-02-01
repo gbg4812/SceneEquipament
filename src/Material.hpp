@@ -9,11 +9,11 @@ class Material : public Resource {
    public:
     Material(std::string name, uint32_t rid) : Resource(name, rid) {}
 
-    void setParameters(const std::vector<ParameterTypes>& parameters) {
+    void setShader(ShaderHandle sh, const Shader& shader) {
         _parameters.clear();
 
         // TODO: centralize defaults
-        for (ParameterTypes parmT : parameters) {
+        for (ParameterTypes parmT : shader.getParameters()) {
             switch (parmT) {
                 case FLOAT_PARM:
                     _parameters.push_back(0.0f);
@@ -32,9 +32,11 @@ class Material : public Resource {
     }
 
     const std::vector<parm_vt>& getValues() { return _parameters; }
+    ShaderHandle getShaderHandle() const { return _shaderh; }
 
    private:
     std::vector<parm_vt> _parameters;
+    ShaderHandle _shaderh;
 };
 
 class MaterialHandle : public ResourceHandle {
