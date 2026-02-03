@@ -14,7 +14,13 @@
 
 namespace gbg {
 
-inline void parseVertexPos(const std::string& line, Mesh& mesh) {
+struct _parser_context {
+    uint count = 0;
+    uint offset = 0;
+};
+
+inline void parseVertexPos(const std::string& line, Mesh& mesh,
+                           _parser_context& context) {
     char c;
     float x, y, z;
     std::stringstream ss(line);
@@ -22,9 +28,11 @@ inline void parseVertexPos(const std::string& line, Mesh& mesh) {
     mesh.addVertex();
     auto& attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(0);
     attr.back() = glm::vec3(x, y, z);
+    context.count++;
 }
 
-inline void parseFace(const std::string& line, Mesh& mesh) {
+inline void parseFace(const std::string& line, Mesh& mesh,
+                      _parser_context& context) {
     std::regex posnbs(R"(\s+(\d+)/)");
 
     face_t face;
@@ -32,7 +40,7 @@ inline void parseFace(const std::string& line, Mesh& mesh) {
     for (std::sregex_iterator it(line.begin(), line.end(), posnbs);
          it != std::sregex_iterator{}; ++it) {
         std::cout << (*it)[1] << std::endl;
-        face.push_back(std::stoul((*it)[1]) - 1);
+        face.push_back(std::stoul((*it)[1]) - 1 - context.offset);
     }
 
     mesh.createFace(face);
@@ -40,7 +48,9 @@ inline void parseFace(const std::string& line, Mesh& mesh) {
 
 inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
                       MaterialHandle default_mat) {
-    std::map<std::string, void (*)(const std::string&, Mesh&)> dispatch;
+    std::map<std::string,
+             void (*)(const std::string&, Mesh&, _parser_context& context)>
+        dispatch;
     dispatch["v"] = parseVertexPos;
     dispatch["f"] = parseFace;
 
@@ -54,6 +64,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
     MeshHandle msh;
 
     std::string line;
+    _parser_context context{};
     while (std::getline(fs, line)) {
         std::string type;
         std::stringstream ss(line);
@@ -71,11 +82,13 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
             Mesh& msh_i = ms_mg.get(msh);
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
 
+            context.offset = context.count;
+
         } else if (!mdh.empty()) {
             Mesh& msh_i = ms_mg.get(msh);
             auto it = dispatch.find(type);
             if (it != dispatch.end()) {
-                (*it).second(line, msh_i);
+                (*it).second(line, msh_i, context);
             }
         }
     }
