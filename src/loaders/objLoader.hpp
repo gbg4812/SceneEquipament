@@ -46,6 +46,17 @@ inline void parseFace(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
+inline void parseNormal(const std::string& line, Mesh& mesh,
+                        _parser_context& context) {
+    std::string c;
+    float x, y, z;
+    std::stringstream ss(line);
+    ss >> c >> x >> y >> z;
+    auto& attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(1);
+    attr.back() = glm::vec3(x, y, z);
+    context.count++;
+}
+
 inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
                       MaterialHandle default_mat) {
     std::map<std::string,
@@ -53,6 +64,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
         dispatch;
     dispatch["v"] = parseVertexPos;
     dispatch["f"] = parseFace;
+    dispatch["vn"] = parseNormal;
 
     std::ifstream fs(path);
     if (fs.fail()) return false;
@@ -81,6 +93,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
             md_mg.get(mdh).setMaterial(default_mat);
             Mesh& msh_i = ms_mg.get(msh);
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
+            msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
 
             context.offset = context.count;
 
