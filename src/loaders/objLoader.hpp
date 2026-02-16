@@ -1,3 +1,8 @@
+/*
+ * 1. Llegir tota la info en 3 vectors
+ * 2. Per cada vertex d'una cara buscar si ja existeix i sinó crear-lo.
+ * 3. Alhora crear la cara.
+ */
 
 #include <sys/types.h>
 
@@ -7,16 +12,46 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
+#include "glm/gtx/hash.hpp"
 
 namespace gbg {
 
+struct _parser_vertex {
+    glm::vec3 pos;
+    glm::vec3 nrml;
+    glm::vec2 tex;
+
+    bool operator==(const _parser_vertex& other) const {
+        return (pos == other.pos) and (nrml == other.nrml) and
+               (tex == other.tex);
+    }
+};
+
 struct _parser_context {
-    uint count = 0;
-    uint offset = 0;
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uvs;
+    std::unordered_map<_parser_vertex, size_t> vertices;
+};
+
+std::size_t hash_combine(std::size_t h1, std::size_t h2) {
+    h1 ^= h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
+    return h1;
+}
+
+struct _parser_vertex_hash {
+    std::size_t operator()(const _parser_vertex& vert) const noexcept {
+        std::size_t h1 = std::hash<glm::vec3>{}(vert.pos);
+        std::size_t h2 = std::hash<glm::vec3>{}(vert.nrml);
+        std::size_t h3 = std::hash<glm::vec2>{}(vert.tex);
+
+        return hash_combine(hash_combine(h1, h2), h3);
+    }
 };
 
 inline void parseVertexPos(const std::string& line, Mesh& mesh,
@@ -25,36 +60,61 @@ inline void parseVertexPos(const std::string& line, Mesh& mesh,
     float x, y, z;
     std::stringstream ss(line);
     ss >> c >> x >> y >> z;
-    mesh.addVertex();
-    auto& attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(0);
-    attr.back() = glm::vec3(x, y, z);
-    context.count++;
+    context.positions.push_back(glm::vec3(x, y, z));
+}
+
+inline void parseVertexNormal(const std::string& line, Mesh& mesh,
+                              _parser_context& context) {
+    char c;
+    float x, y, z;
+    std::stringstream ss(line);
+    ss >> c >> x >> y >> z;
+    context.normals.push_back(glm::vec3(x, y, z));
+}
+
+inline void parseVertexUV(const std::string& line, Mesh& mesh,
+                          _parser_context& context) {
+    char c;
+    float x, y;
+    std::stringstream ss(line);
+    ss >> c >> x >> y;
+    context.uvs.push_back(glm::vec2(x, y));
 }
 
 inline void parseFace(const std::string& line, Mesh& mesh,
                       _parser_context& context) {
-    std::regex posnbs(R"(\s+(\d+)/)");
+    std::regex posnbs(R"(\s+(\d+)/(\d+)/(\d+))");
 
     face_t face;
 
     for (std::sregex_iterator it(line.begin(), line.end(), posnbs);
          it != std::sregex_iterator{}; ++it) {
         std::cout << (*it)[1] << std::endl;
-        face.push_back(std::stoul((*it)[1]) - 1 - context.offset);
+        std::size_t pos_idx = std::stoi((*it)[1]) - 1;
+        std::size_t nrml_idx = std::stoi((*it)[2]) - 1;
+        std::size_t tex_idx = std::stoi((*it)[3]) - 1;
+        _parser_vertex vert = {context.positions[pos_idx],
+                               context.normals[nrml_idx], context.uvs[tex_idx]};
+
+        auto vert_it = context.vertices.find(vert);
+        if (vert_it != context.vertices.end()) {
+            face.push_back(vert_it->second);
+        } else {
+            size_t vert_idx = mesh.addVertex();
+            context.vertices.insert({vert, vert_idx});
+
+            auto& pos_attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(0);
+            auto& nrml_attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(1);
+            auto& uv_attr = mesh.getAttribute<AttributeTypes::VEC2_ATTR>(2);
+            *(--pos_attr.end()) = vert.pos;
+            *(--nrml_attr.end()) = vert.nrml;
+            *(--uv_attr.end()) = vert.tex;
+
+            face.push_back(vert_idx);
+        }
     }
 
     mesh.createFace(face);
-}
-
-inline void parseNormal(const std::string& line, Mesh& mesh,
-                        _parser_context& context) {
-    std::string c;
-    float x, y, z;
-    std::stringstream ss(line);
-    ss >> c >> x >> y >> z;
-    auto& attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(1);
-    attr.back() = glm::vec3(x, y, z);
-    context.count++;
 }
 
 inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
@@ -63,8 +123,9 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
              void (*)(const std::string&, Mesh&, _parser_context& context)>
         dispatch;
     dispatch["v"] = parseVertexPos;
+    dispatch["vn"] = parseVertexNormal;
+    dispatch["vt"] = parseVertexUV;
     dispatch["f"] = parseFace;
-    dispatch["vn"] = parseNormal;
 
     std::ifstream fs(path);
     if (fs.fail()) return false;

@@ -42,11 +42,11 @@ class Mesh : public Resource {
         _attributes.insert({location, attr_vt_alt<I>(_nvertices)});
     }
 
-    void addVertex() {
-        _nvertices++;
+    size_t addVertex() {
         for (auto& attrb : _attributes) {
             std::visit<void>(_DefaultVertex_V{}, attrb.second);
         }
+        return _nvertices++;
     }
 
     const std::map<uint, attr_vt>& getAttributes() const { return _attributes; }
