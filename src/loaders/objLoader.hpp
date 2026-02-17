@@ -7,6 +7,7 @@
 #include <sys/types.h>
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <ostream>
 #include <regex>
@@ -32,26 +33,30 @@ struct _parser_vertex {
     }
 };
 
-struct _parser_context {
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> uvs;
-    std::unordered_map<_parser_vertex, size_t> vertices;
-};
-
 std::size_t hash_combine(std::size_t h1, std::size_t h2) {
     h1 ^= h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
     return h1;
 }
 
-struct _parser_vertex_hash {
-    std::size_t operator()(const _parser_vertex& vert) const noexcept {
+}  // namespace gbg
+template <>
+struct std::hash<gbg::_parser_vertex> {
+    std::size_t operator()(const gbg::_parser_vertex& vert) const noexcept {
         std::size_t h1 = std::hash<glm::vec3>{}(vert.pos);
         std::size_t h2 = std::hash<glm::vec3>{}(vert.nrml);
         std::size_t h3 = std::hash<glm::vec2>{}(vert.tex);
 
-        return hash_combine(hash_combine(h1, h2), h3);
-    }
+        return gbg::hash_combine(gbg::hash_combine(h1, h2), h3);
+    };
+};
+
+namespace gbg {
+
+struct _parser_context {
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uvs;
+    std::unordered_map<_parser_vertex, size_t> vertices;
 };
 
 inline void parseVertexPos(const std::string& line, Mesh& mesh,
@@ -155,8 +160,9 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
             Mesh& msh_i = ms_mg.get(msh);
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
+            msh_i.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // normal
 
-            context.offset = context.count;
+            context.vertices.clear();
 
         } else if (!mdh.empty()) {
             Mesh& msh_i = ms_mg.get(msh);
