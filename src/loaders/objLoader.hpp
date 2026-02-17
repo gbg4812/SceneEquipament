@@ -18,6 +18,7 @@
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 
 namespace gbg {
@@ -33,7 +34,7 @@ struct _parser_vertex {
     }
 };
 
-std::size_t hash_combine(std::size_t h1, std::size_t h2) {
+inline std::size_t hash_combine(std::size_t h1, std::size_t h2) {
     h1 ^= h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
     return h1;
 }
@@ -73,7 +74,7 @@ inline void parseVertexNormal(const std::string& line, Mesh& mesh,
     char c;
     float x, y, z;
     std::stringstream ss(line);
-    ss >> c >> x >> y >> z;
+    ss >> c >> c >> x >> y >> z;
     context.normals.push_back(glm::vec3(x, y, z));
 }
 
@@ -82,7 +83,7 @@ inline void parseVertexUV(const std::string& line, Mesh& mesh,
     char c;
     float x, y;
     std::stringstream ss(line);
-    ss >> c >> x >> y;
+    ss >> c >> c >> x >> y;
     context.uvs.push_back(glm::vec2(x, y));
 }
 
@@ -96,8 +97,8 @@ inline void parseFace(const std::string& line, Mesh& mesh,
          it != std::sregex_iterator{}; ++it) {
         std::cout << (*it)[1] << std::endl;
         std::size_t pos_idx = std::stoi((*it)[1]) - 1;
-        std::size_t nrml_idx = std::stoi((*it)[2]) - 1;
-        std::size_t tex_idx = std::stoi((*it)[3]) - 1;
+        std::size_t tex_idx = std::stoi((*it)[2]) - 1;
+        std::size_t nrml_idx = std::stoi((*it)[3]) - 1;
         _parser_vertex vert = {context.positions[pos_idx],
                                context.normals[nrml_idx], context.uvs[tex_idx]};
 

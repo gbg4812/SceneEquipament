@@ -57,7 +57,7 @@ TEST(loader_tests, loader_load) {
     ASSERT_EQ(ms_mg.getAll()[0]
                   .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
                   .size(),
-              8);
+              16);
 
     std::cout << ms_mg.getAll()[0].getFaces() << std::endl;
 }
