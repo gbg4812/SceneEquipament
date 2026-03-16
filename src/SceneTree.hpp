@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <list>
 #include <variant>
+#include <vector>
 
 #include "Model.hpp"
 
@@ -19,64 +20,28 @@ template <SceneObjectTypes I>
 using scene_obj_alt =
     std::variant_alternative_t<to_underlying(I), scene_obj_vt>;
 
+struct SceneTreeHandle {
+    SceneTreeHandle(size_t idx) : idx(idx) {}
+    size_t idx;
+};
+
+struct SceneTreeNode {
+    SceneTreeHandle parent = 0;
+    std::list<SceneTreeHandle> children;
+    glm::mat4x4 transform;
+    scene_obj_vt resource;
+    size_t id;
+};
+
 class SceneTree {
-   public:
-    ~SceneTree() {
-        for (SceneTree* child : _children) {
-            delete child;
-        }
-    }
-
-    const std::list<SceneTree*>& getChildren() { return _children; }
-    SceneTree* getParent() { return _parent; }
-    const glm::mat4x4& getLocalTransform() { return _transform; }
-
-    SceneObjectTypes getType() { return (SceneObjectTypes)_resource.index(); }
-
-    template <SceneObjectTypes I>
-    scene_obj_alt<I> getResourceHandle() {
-        return std::get<I>(_resource);
-    }
-
-    const scene_obj_vt& getResourceHandle() { return _resource; }
-
-    template <SceneObjectTypes I>
-    void setSceneObjectHandle(scene_obj_alt<I> object) {
-        _resource = object;
-    }
-
-    void multiplyLocalTransform(const glm::mat4x4& transform) {
-        _transform = _transform * transform;
-    }
-
-    glm::mat4x4 computeTransform() {
-        if (_parent) return _parent->computeTransform() * _transform;
-        return _transform;
-    };
-
-    template <SceneObjectTypes I>
-    SceneTree* addChild(scene_obj_alt<I> child) {
-        SceneTree* newT = new SceneTree();
-        newT->setSceneObjectHandle<I>(child);
-        _children.push_back(newT);
-        return *_children.end();
-    }
-
-    void removeChild(SceneTree* child) {
-        _children.remove(child);
-        delete child;
-    }
-
-    void setParent(SceneTree* parent) {
-        if (_parent) _parent->removeChild(this);
-        _parent = parent;
-    }
+    SceneTree(size_t initial_size)
+        : _nodes(initial_size), _next_id(0), _next_idx(0) {};
 
    private:
-    SceneTree* _parent = nullptr;
-    std::list<SceneTree*> _children;
-    glm::mat4x4 _transform;
-    scene_obj_vt _resource;
+    std::vector<SceneTreeNode> _nodes;
+    std::list<size_t> _empty_lst;
+    size_t _next_idx;
+    size_t _next_id;
 };
 
 }  // namespace gbg
