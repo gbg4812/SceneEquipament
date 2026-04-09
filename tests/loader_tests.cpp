@@ -39,15 +39,17 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
 
 TEST(loader_tests, loader_load) {
     Scene sc;
-    SceneTree tree;
 
     auto& mt_mg = sc.getMaterialManager();
     auto& md_mg = sc.getModelManager();
     auto& ms_mg = sc.getMeshManager();
+    auto& st_mg = sc.getSceneTreeManger();
+
+    auto parent = st_mg.create("Root");
 
     auto mth = mt_mg.create("Default Material");
 
-    objLoader("./data/Cube.obj", &sc, &tree, mth);
+    objLoader("./data/Cube.obj", &sc, parent, mth);
 
     ASSERT_EQ(md_mg.getAll()[0].getName(), "Cube");
 
@@ -57,7 +59,7 @@ TEST(loader_tests, loader_load) {
     ASSERT_EQ(ms_mg.getAll()[0]
                   .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
                   .size(),
-              16);
+              24);
 
     std::cout << ms_mg.getAll()[0].getFaces() << std::endl;
 }

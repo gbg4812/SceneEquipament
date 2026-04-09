@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdio>
-#include <list>
 #include <variant>
-#include <vector>
 
 #include "Model.hpp"
+#include "Resource.hpp"
+#include "gbg_traits.hpp"
 
 namespace gbg {
 
@@ -20,28 +20,47 @@ template <SceneObjectTypes I>
 using scene_obj_alt =
     std::variant_alternative_t<to_underlying(I), scene_obj_vt>;
 
-struct SceneTreeHandle {
-    SceneTreeHandle(size_t idx) : idx(idx) {}
-    size_t idx;
+struct SceneTreeHandle : public ResourceHandle {
+    SceneTreeHandle() : ResourceHandle() {}
+    SceneTreeHandle(size_t _nextid) : ResourceHandle() {}
+    SceneTreeHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
 };
 
-struct SceneTreeNode {
-    SceneTreeHandle parent = 0;
-    std::list<SceneTreeHandle> children;
+class SceneTreeNode : public Resource {
+    // TODO: rid 0 vol dir que és null
+   public:
+    SceneTreeNode() : Resource() {};
+    SceneTreeNode(std::string name, uint32_t rid) : Resource(name, rid) {}
+
+    template <SceneObjectTypes I>
+    scene_obj_alt<I> getResourceH() {
+        return std::get<to_underlying(I)>(_resource);
+    }
+
+    void setResource(scene_obj_vt object) { _resource = object; }
+
+   public:
+    SceneTreeHandle parentH;
+    SceneTreeHandle childH;
+    SceneTreeHandle nextH;
     glm::mat4x4 transform;
-    scene_obj_vt resource;
-    size_t id;
+
+   public:
+    scene_obj_vt _resource;
 };
 
-class SceneTree {
-    SceneTree(size_t initial_size)
-        : _nodes(initial_size), _next_id(0), _next_idx(0) {};
+class SceneTreeManager
+    : public ResourceManager<SceneTreeNode, SceneTreeHandle> {
+   public:
+    SceneTreeManager(size_t initial_size = 0) : ResourceManager(initial_size) {}
 
-   private:
-    std::vector<SceneTreeNode> _nodes;
-    std::list<size_t> _empty_lst;
-    size_t _next_idx;
-    size_t _next_id;
+    void prependChild(SceneTreeHandle parent, SceneTreeHandle child) {
+        SceneTreeNode& parentn = this->get(parent);
+        SceneTreeNode& childn = this->get(child);
+        childn.nextH = parentn.childH;
+        parentn.childH = child;
+        childn.parentH = parent;
+    }
 };
 
 }  // namespace gbg

@@ -123,7 +123,7 @@ inline void parseFace(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
-inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
+inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
                       MaterialHandle default_mat) {
     std::map<std::string,
              void (*)(const std::string&, Mesh&, _parser_context& context)>
@@ -138,6 +138,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
 
     auto& md_mg = scene->getModelManager();
     auto& ms_mg = scene->getMeshManager();
+    auto& st_mg = scene->getSceneTreeManger();
 
     ModelHandle mdh;
     MeshHandle msh;
@@ -153,7 +154,9 @@ inline bool objLoader(std::string path, Scene* scene, SceneTree* parent,
             std::string name;
             ss >> name;
             mdh = md_mg.create(name);
-            parent->addChild<gbg::SceneObjectTypes::MODEL>(mdh);
+            SceneTreeHandle child = st_mg.create(name);
+            st_mg.get(child).setResource(mdh);
+            st_mg.prependChild(parent, child);
             msh = ms_mg.create("Mesh0");
 
             md_mg.get(mdh).setMesh(msh);

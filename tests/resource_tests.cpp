@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "AttributeTypes.hpp"
 #include "Mesh.hpp"
 #include "Resource.hpp"
@@ -13,8 +11,8 @@ TEST(resource_tests, create_resource) {
     auto h0 = mg.create("Resource1");
     auto h1 = mg.create("Resource2");
 
-    auto r1 = mg.get(h0);
-    auto r2 = mg.get(h1);
+    auto& r1 = mg.get(h0);
+    auto& r2 = mg.get(h1);
 
     EXPECT_EQ(r1.getName(), "Resource1");
     EXPECT_EQ(r2.getName(), "Resource2");

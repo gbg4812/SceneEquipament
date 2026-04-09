@@ -21,6 +21,11 @@ class Resource {
     Resource() : _rid(0) {};
     Resource(std::string name, uint32_t rid) : _name(name), _rid(rid) {}
 
+    Resource(const Resource& other) = delete;
+    Resource& operator=(const Resource& other) = delete;
+    Resource(Resource&& other) = default;
+    Resource& operator=(Resource&& other) = default;
+
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
@@ -45,9 +50,12 @@ class ResourceHandle {
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
     bool empty() { return _rid == 0; }
+
     bool operator==(const ResourceHandle& other) const {
         return (other._index == _index) and (other._rid == _rid);
     }
+
+    explicit operator bool() { return _rid != 0; }
 };
 
 // Manager class to allocate and get instances of a type of resource
@@ -64,6 +72,11 @@ class ResourceManager {
     ResourceManager(size_t initial_size = 0) {
         _resources.reserve(initial_size);
     }
+
+    ResourceManager(const ResourceManager& other) = delete;
+    ResourceManager& operator=(const ResourceManager& other) = delete;
+    ResourceManager(ResourceManager&& other) = default;
+    ResourceManager& operator=(ResourceManager&& other) = default;
 
     TH create(std::string name) {
         size_t index = _resources.size();
