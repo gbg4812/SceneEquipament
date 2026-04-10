@@ -138,7 +138,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
 
     auto& md_mg = scene->getModelManager();
     auto& ms_mg = scene->getMeshManager();
-    auto& st_mg = scene->getSceneTreeManger();
+    auto& st_mg = scene->getSceneTreeManager();
 
     ModelHandle mdh;
     MeshHandle msh;

@@ -43,7 +43,7 @@ TEST(loader_tests, loader_load) {
     auto& mt_mg = sc.getMaterialManager();
     auto& md_mg = sc.getModelManager();
     auto& ms_mg = sc.getMeshManager();
-    auto& st_mg = sc.getSceneTreeManger();
+    auto& st_mg = sc.getSceneTreeManager();
 
     auto parent = st_mg.create("Root");
 

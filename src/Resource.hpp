@@ -41,8 +41,8 @@ class Resource {
 
 // identifies a resource
 class ResourceHandle {
-    uint32_t _rid;
-    size_t _index;
+    uint32_t _rid = 0;
+    size_t _index = 0;
 
    public:
     ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}

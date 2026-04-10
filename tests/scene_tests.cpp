@@ -56,17 +56,17 @@ TEST(scene_tests, scene_tree) {
     ModelHandle mdl = md_mg.create("Model1");
     ModelHandle mdl2 = md_mg.create("Model2");
 
-    auto& st_mg = sc.getSceneTreeManger();
+    auto& st_mg = sc.getSceneTreeManager();
     SceneTreeHandle rooth = st_mg.create("Root");
-    st_mg.get(rooth).resource = mdl;
+    st_mg.get(rooth).setResource(mdl);
     SceneTreeHandle child1h = st_mg.create("Child1");
-    st_mg.get(child1h).resource = mdl2;
+    st_mg.get(child1h).setResource(mdl2);
 
     st_mg.prependChild(rooth, child1h);
 
     SceneTreeNode& root = st_mg.get(rooth);
 
-    ASSERT_EQ(mdl, std::get<ModelHandle>(root.resource));
+    ASSERT_EQ(mdl, root.getResourceH<SceneObjectTypes::MODEL>());
     ASSERT_EQ(child1h, root.childH);
     ASSERT_EQ(st_mg.get(child1h).parentH, rooth);
 }
