@@ -9,7 +9,9 @@ namespace gbg {
 
 class Scene {
    public:
-    Scene() = default;
+    Scene() {
+        root = _st_mg.create("Root");
+    };
     Scene(Scene& other) = delete;
 
     ResourceManager<Mesh, MeshHandle>& getMeshManager() { return _ms_mg; }
@@ -20,12 +22,15 @@ class Scene {
     ResourceManager<Model, ModelHandle>& getModelManager() { return _md_mg; }
     SceneTreeManager& getSceneTreeManager() { return _st_mg; }
 
+    SceneTreeHandle root;
+
    private:
     ResourceManager<Material, MaterialHandle> _mat_mg;
     ResourceManager<Shader, ShaderHandle> _sh_mg;
     ResourceManager<Mesh, MeshHandle> _ms_mg;
     ResourceManager<Model, ModelHandle> _md_mg;
     SceneTreeManager _st_mg;
+
 };
 
 }  // namespace gbg

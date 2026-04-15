@@ -37,6 +37,10 @@ class SceneTreeNode : public Resource {
         return std::get<to_underlying(I)>(_resource);
     }
 
+    scene_obj_vt getResourceH() {
+        return _resource;
+    }
+
     void setResource(scene_obj_vt object) { _resource = object; }
 
    public:
@@ -45,7 +49,7 @@ class SceneTreeNode : public Resource {
     SceneTreeHandle nextH;
     glm::mat4x4 transform;
 
-   public:
+   private:
     scene_obj_vt _resource;
 };
 

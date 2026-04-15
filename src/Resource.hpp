@@ -1,17 +1,16 @@
 #pragma once
+#include <cassert>
 #include <cstdint>
 #include <queue>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-#include "DepDataHandle.hpp"
-
 namespace gbg {
 
 enum ResourceFlags {
     DIRTY = 0x01,
-    INVISIBLE,
+    INVISIBLE = 0x02,
 };
 
 // base class for any resource
@@ -29,14 +28,18 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
-    DepDataHandle getDepDataHandle() const { return _handle; }
-    void setDepDataHandle(DepDataHandle h) { _handle = h; }
-    void setDepDataFlags(ResourceFlags flags) { _handle.flags = flags; }
+    void setFlags(ResourceFlags flags) {
+        _flags = _flags | flags;
+    }
+
+    void unsetFlag(ResourceFlags flags) {
+        _flags = _flags & (~flags); // 1010 0010 -> 1101 & 1010
+    }
 
    private:
     std::string _name;
     uint32_t _rid;
-    DepDataHandle _handle;
+    uint32_t _flags;
 };
 
 // identifies a resource
@@ -92,10 +95,32 @@ class ResourceManager {
         return h;
     }
 
-    T& get(const TH& handle) { return _resources[handle.getIndex()]; }
+    T& get(const TH& handle) {
+        assert(handle.getRID() == _resources[handle.getIndex()].getRID());
+        return _resources[handle.getIndex()];
+    }
+
+    T& getRelated(const ResourceHandle& handle) {
+        assert(handle.getRID() == _resources[handle.getIndex()].getRID());
+        return _resources[handle.getIndex()];
+    }
     std::vector<T>& getAll() { return _resources; }
-    void clear() { _resources.clear(); }
-    void destroy(const TH& handle) { _free_indexes.push(handle.getIndex()); }
+    void clear() {
+        _resources.clear();
+        while(!_free_indexes.empty())
+        _free_indexes.pop();
+    }
+    void destroy(const TH& handle) {
+        _free_indexes.push(handle.getIndex());
+    }
+
+    class iterator {
+
+        private:
+        //TODO:
+    }
+
+
 
    private:
     std::vector<T> _resources;

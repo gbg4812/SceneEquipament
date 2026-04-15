@@ -90,3 +90,18 @@ Són dades que es comparteixen entre diversos objectes, materials... S'han de
 alocar i desalocar controladament.
 
 Utilitzarem Handles i Pools per allocar-los i referenciar-los.
+
+## What if there is not DepDataHandle
+
+Example renderer and models:
+Renderer has a pool of vkModels (if that exists) where each vkModel has the same index than the corresponding 
+Model. If Model is not visible (it does not need to have memory allocated to the GPU) the corresponding vkModel
+can have invalid (empty) handles to the GPU resources so it only occupies RAM. 
+To do this vkModel should be a Resource Also? Only for security (checking id is the same) and 
+reusability of the pulls but it is not required. If it were to be a Resource i need to find 
+a way of creating resources based of an index and id of another resource. Problems: checking the 
+id is free (not a problem if theoretically is an exact copy of another pool which is coherent),
+if the original pool changes size... (should be checked before using and resized accordingly(maybe latter?)).
+Maybe it is not needed as new instances would be marked as new so they would be just created in the other pool.
+
+(Dependent pools?)
