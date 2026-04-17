@@ -18,6 +18,7 @@ using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 class Shader : public Resource {
    public:
+    Shader() : Resource() {};
     Shader(std::string name, uint32_t rid) : Resource(name, rid) {};
 
     // returns the position

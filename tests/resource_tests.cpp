@@ -37,4 +37,19 @@ TEST(resource_tests, create_mesh_resource) {
     at1[2] = 0.f;
 
     m1.createFace({0, 0, 1});
+
+    mg.create("Mesh3");
+    auto h4 = mg.create("Mesh4");
+    mg.create("Mesh5");
+    mg.create("Mesh6");
+    mg.destroy(h4);
+
+    int i = 1;
+    for (auto& res : mg) {
+        ASSERT_EQ(res.getName(), "Mesh" + std::to_string(i));
+        if (i == 3) i++;
+        i++;
+    }
+
+    ASSERT_EQ(i, 7);
 }

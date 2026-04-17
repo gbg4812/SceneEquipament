@@ -7,6 +7,7 @@ namespace gbg {
 
 class Model : public Resource {
    public:
+    Model() : Resource() {};
     Model(std::string name, uint32_t rid) : Resource(name, rid) {};
 
     void setMesh(MeshHandle mesh) { _mesh = mesh; }

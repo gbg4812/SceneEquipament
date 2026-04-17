@@ -7,10 +7,12 @@ namespace gbg {
 
 class Material : public Resource {
    public:
+    Material() : Resource() {}
     Material(std::string name, uint32_t rid) : Resource(name, rid) {}
 
     void setShader(ShaderHandle sh, const Shader& shader) {
         _parameters.clear();
+        _shaderh = sh;
 
         // TODO: centralize defaults
         for (ParameterTypes parmT : shader.getParameters()) {

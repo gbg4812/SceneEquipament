@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <cstdint>
-#include <queue>
+#include <list>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -28,12 +28,10 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
-    void setFlags(ResourceFlags flags) {
-        _flags = _flags | flags;
-    }
+    void setFlags(ResourceFlags flags) { _flags = _flags | flags; }
 
     void unsetFlag(ResourceFlags flags) {
-        _flags = _flags & (~flags); // 1010 0010 -> 1101 & 1010
+        _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
     }
 
    private:
@@ -70,10 +68,14 @@ class ResourceManager {
                   "The Resource type must be based of Resource");
     static_assert(std::is_constructible_v<T, std::string, uint32_t>,
                   "The Resource must have this constructor");
+    static_assert(
+        std::is_default_constructible_v<T>,
+        "The Resource must be default constructible with a call to Resource()");
 
    public:
     ResourceManager(size_t initial_size = 0) {
-        _resources.reserve(initial_size);
+        _resources.reserve(initial_size + 1);
+        _resources.push_back(T());
     }
 
     ResourceManager(const ResourceManager& other) = delete;
@@ -86,7 +88,7 @@ class ResourceManager {
         if (not _free_indexes.empty()) {
             _resources[_free_indexes.front()] = T(name, _nextid);
             index = _free_indexes.front();
-            _free_indexes.pop();
+            _free_indexes.pop_front();
         } else {
             _resources.push_back(T(name, _nextid));
         }
@@ -107,24 +109,59 @@ class ResourceManager {
     std::vector<T>& getAll() { return _resources; }
     void clear() {
         _resources.clear();
-        while(!_free_indexes.empty())
-        _free_indexes.pop();
+        while (!_free_indexes.empty()) _free_indexes.pop_front();
     }
     void destroy(const TH& handle) {
-        _free_indexes.push(handle.getIndex());
+        _resources[handle.getIndex()] = T();
+        _free_indexes.push_front(handle.getIndex());
     }
 
     class iterator {
+       public:
+        iterator(ResourceManager<T, TH>& manager, TH handle)
+            : _handl(handle), _manager(manager) {}
 
-        private:
-        //TODO:
+        iterator operator++(int) {
+            iterator aux = iterator(_manager, _handl);
+            ++(*this);
+            return aux;
+        };
+
+        iterator& operator++() {
+            size_t index = _handl.getIndex() + 1;
+            while (index < _manager._resources.size() &&
+                   _manager._resources[index].getRID() == 0) {
+                index++;
+            }
+            if (index >= _manager._resources.size()) index = 0;
+            _handl = TH(_manager._resources[index].getRID(), index);
+            return *this;
+        };
+
+        bool operator==(const ResourceManager<T, TH>::iterator& other) const {
+            return other._handl == this->_handl;
+        }
+
+        T& operator*() { return _manager.get(_handl); }
+
+        T& operator->() { return *(*this); }
+
+       private:
+        TH _handl;
+        ResourceManager<T, TH>& _manager;
+    };
+
+    iterator begin() {
+        if (_resources.size() > 1)
+            return iterator(*this, TH(_resources[1].getRID(), 1));
+        return end();
     }
 
-
+    iterator end() { return iterator(*this, TH(0, 0)); }
 
    private:
     std::vector<T> _resources;
-    std::queue<size_t> _free_indexes;
+    std::list<size_t> _free_indexes;
     // 0 is reserved
     uint32_t _nextid = 1;
 };
