@@ -29,7 +29,7 @@ struct SceneTreeHandle : public ResourceHandle {
 class SceneTreeNode : public Resource {
     // TODO: rid 0 vol dir que és null
    public:
-    SceneTreeNode() : Resource() {};
+    SceneTreeNode() : Resource(){};
     SceneTreeNode(std::string name, uint32_t rid) : Resource(name, rid) {}
 
     template <SceneObjectTypes I>
@@ -37,9 +37,7 @@ class SceneTreeNode : public Resource {
         return std::get<to_underlying(I)>(_resource);
     }
 
-    scene_obj_vt getResourceH() {
-        return _resource;
-    }
+    scene_obj_vt getResourceH() { return _resource; }
 
     void setResource(scene_obj_vt object) { _resource = object; }
 
@@ -47,7 +45,7 @@ class SceneTreeNode : public Resource {
     SceneTreeHandle parentH;
     SceneTreeHandle childH;
     SceneTreeHandle nextH;
-    glm::mat4x4 transform;
+    glm::mat4x4 transform = glm::mat4(1.0f);
 
    private:
     scene_obj_vt _resource;
