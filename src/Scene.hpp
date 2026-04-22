@@ -21,6 +21,7 @@ class Scene {
     }
     ResourceManager<Model, ModelHandle>& getModelManager() { return _md_mg; }
     SceneTreeManager& getSceneTreeManager() { return _st_mg; }
+    ResourceManager<Camera, CameraHandle>& getCameraManager() { return _cm_mg; }
 
     SceneTreeHandle root;
 
@@ -29,6 +30,7 @@ class Scene {
     ResourceManager<Shader, ShaderHandle> _sh_mg;
     ResourceManager<Mesh, MeshHandle> _ms_mg;
     ResourceManager<Model, ModelHandle> _md_mg;
+    ResourceManager<Camera, CameraHandle> _cm_mg;
     SceneTreeManager _st_mg;
 
 };

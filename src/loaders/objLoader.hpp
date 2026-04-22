@@ -95,7 +95,6 @@ inline void parseFace(const std::string& line, Mesh& mesh,
 
     for (std::sregex_iterator it(line.begin(), line.end(), posnbs);
          it != std::sregex_iterator{}; ++it) {
-        std::cout << (*it)[1] << std::endl;
         std::size_t pos_idx = std::stoi((*it)[1]) - 1;
         std::size_t tex_idx = std::stoi((*it)[2]) - 1;
         std::size_t nrml_idx = std::stoi((*it)[3]) - 1;

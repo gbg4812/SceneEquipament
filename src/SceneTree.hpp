@@ -4,8 +4,10 @@
 #include <variant>
 
 #include "Model.hpp"
+#include "Camera.hpp"
 #include "Resource.hpp"
 #include "gbg_traits.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 namespace gbg {
 
@@ -14,7 +16,7 @@ enum SceneObjectTypes {
     MODEL = 1,
 };
 
-typedef std::variant<std::monostate, ModelHandle> scene_obj_vt;
+typedef std::variant<std::monostate, ModelHandle, CameraHandle> scene_obj_vt;
 
 template <SceneObjectTypes I>
 using scene_obj_alt =
@@ -45,7 +47,27 @@ class SceneTreeNode : public Resource {
     SceneTreeHandle parentH;
     SceneTreeHandle childH;
     SceneTreeHandle nextH;
-    glm::mat4x4 transform = glm::mat4(1.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    glm::vec3 translation = glm::vec3(0.0f);
+    glm::vec3 scale = glm::vec3(1.0f);
+
+    glm::mat4 getLocalTransform() {
+        glm::mat4 trans(1.0f);
+        trans = glm::translate(trans, translation);
+        trans = glm::rotate(trans, rotation.x, {1.0, 0.0, 0.0});
+        trans = glm::rotate(trans, rotation.y, {0.0, 1.0, 0.0});
+        trans = glm::rotate(trans, rotation.z, {0.0, 0.0, 1.0});
+        trans = glm::scale(trans, scale);
+        return trans;
+    }
+
+    void localTranslate(glm::vec3 offset) {
+        glm::mat4 trans(1.0f);
+        trans = glm::rotate(trans, rotation.x, {1.0, 0.0, 0.0});
+        trans = glm::rotate(trans, rotation.y, {0.0, 1.0, 0.0});
+        trans = glm::rotate(trans, rotation.z, {0.0, 0.0, 1.0});
+        translation += glm::vec3(trans * glm::vec4(offset, 1.));
+    }
 
    private:
     scene_obj_vt _resource;
@@ -63,6 +85,16 @@ class SceneTreeManager
         parentn.childH = child;
         childn.parentH = parent;
     }
+
+
+    glm::mat4 getGlobalTransform(SceneTreeHandle h) {
+        SceneTreeNode& node = this->get(h);
+        if(node.parentH)
+            return node.getLocalTransform() * getGlobalTransform(node.parentH);
+        else
+            return node.getLocalTransform();
+    }
 };
+
 
 }  // namespace gbg
