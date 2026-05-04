@@ -4,14 +4,13 @@
 #include "Model.hpp"
 #include "Resource.hpp"
 #include "SceneTree.hpp"
+#include "Texture.hpp"
 
 namespace gbg {
 
 class Scene {
    public:
-    Scene() {
-        root = _st_mg.create("Root");
-    };
+    Scene() { root = _st_mg.create("Root"); };
     Scene(Scene& other) = delete;
 
     ResourceManager<Mesh, MeshHandle>& getMeshManager() { return _ms_mg; }
@@ -22,6 +21,9 @@ class Scene {
     ResourceManager<Model, ModelHandle>& getModelManager() { return _md_mg; }
     SceneTreeManager& getSceneTreeManager() { return _st_mg; }
     ResourceManager<Camera, CameraHandle>& getCameraManager() { return _cm_mg; }
+    ResourceManager<Texture, TextureHandle>& getTextureManager() {
+        return _tx_mg;
+    }
 
     SceneTreeHandle root;
 
@@ -31,8 +33,8 @@ class Scene {
     ResourceManager<Mesh, MeshHandle> _ms_mg;
     ResourceManager<Model, ModelHandle> _md_mg;
     ResourceManager<Camera, CameraHandle> _cm_mg;
+    ResourceManager<Texture, TextureHandle> _tx_mg;
     SceneTreeManager _st_mg;
-
 };
 
 }  // namespace gbg

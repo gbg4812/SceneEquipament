@@ -6,20 +6,21 @@
 #include "Mesh.hpp"
 #include "ParameterTypes.hpp"
 #include "Resource.hpp"
+#include "Texture.hpp"
 #include "gbg_traits.hpp"
 
 namespace gbg {
-typedef std::variant<float_t, vec2_t, vec3_t> parm_vt;
+typedef std::variant<float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
-enum ParameterTypes { FLOAT_PARM = 0, VEC2_PARM, VEC3_PARM };
+enum ParameterTypes { FLOAT_PARM = 0, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 class Shader : public Resource {
    public:
-    Shader() : Resource() {};
-    Shader(std::string name, uint32_t rid) : Resource(name, rid) {};
+    Shader() : Resource(){};
+    Shader(std::string name, uint32_t rid) : Resource(name, rid){};
 
     // returns the position
     size_t addParameter(ParameterTypes I) {
