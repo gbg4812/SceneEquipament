@@ -18,6 +18,7 @@ class Texture : public Resource {
 };
 
 class TextureHandle : public ResourceHandle {
+    public:
     TextureHandle() : ResourceHandle(){};
     TextureHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
