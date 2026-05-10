@@ -9,15 +9,17 @@
 namespace gbg {
 
 enum ResourceFlags {
-    DIRTY = 0x01,
-    INVISIBLE = 0x02,
+    DIRTY = 1 << 0,
+    INVISIBLE = 1 << 1,
+    NEW = 1 << 2,
+    DELETED = 1 << 3,
 };
 
 // base class for any resource
 class Resource {
    public:
     // TODO: rid 0 vol dir que és null
-    Resource() : _rid(0) {};
+    Resource(){};
     Resource(std::string name, uint32_t rid) : _name(name), _rid(rid) {}
 
     Resource(const Resource& other) = delete;
@@ -34,10 +36,12 @@ class Resource {
         _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
     }
 
+    uint32_t getFlags() { return _flags; }
+
    private:
     std::string _name;
-    uint32_t _rid;
-    uint32_t _flags;
+    uint32_t _rid = 0;
+    uint32_t _flags = 0;
 };
 
 // identifies a resource
@@ -47,7 +51,7 @@ class ResourceHandle {
 
    public:
     ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}
-    ResourceHandle() : _rid(0), _index(0) {};
+    ResourceHandle() : _rid(0), _index(0){};
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return _index; }
     bool empty() { return _rid == 0; }
@@ -87,6 +91,7 @@ class ResourceManager {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
             _resources[_free_indexes.front()] = T(name, _nextid);
+            _resources[_free_indexes.front()].setFlags(ResourceFlags::NEW);
             index = _free_indexes.front();
             _free_indexes.pop_front();
         } else {

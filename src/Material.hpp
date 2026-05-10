@@ -22,8 +22,13 @@ class Material : public Resource {
                     break;
                 case VEC2_PARM:
                     _parameters.push_back(glm::vec2());
+                    break;
                 case VEC3_PARM:
                     _parameters.push_back(glm::vec3());
+                    break;
+                case TEXTURE_PARM:
+                    _parameters.push_back(TextureHandle());
+                    break;
             }
         }
     }
@@ -43,8 +48,8 @@ class Material : public Resource {
 
 class MaterialHandle : public ResourceHandle {
    public:
-    MaterialHandle() : ResourceHandle() {};
-    MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
+    MaterialHandle() : ResourceHandle(){};
+    MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
 
 }  // namespace gbg

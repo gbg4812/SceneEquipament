@@ -7,8 +7,8 @@ namespace gbg {
 
 class Model : public Resource {
    public:
-    Model() : Resource() {};
-    Model(std::string name, uint32_t rid) : Resource(name, rid) {};
+    Model() : Resource(){};
+    Model(std::string name, uint32_t rid) : Resource(name, rid){};
 
     void setMesh(MeshHandle mesh) { _mesh = mesh; }
     void setMaterial(MaterialHandle material) { _material = material; }
@@ -23,8 +23,8 @@ class Model : public Resource {
 
 class ModelHandle : public ResourceHandle {
    public:
-    ModelHandle() : ResourceHandle() {};
-    ModelHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
+    ModelHandle() : ResourceHandle(){};
+    ModelHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
 
 }  // namespace gbg
