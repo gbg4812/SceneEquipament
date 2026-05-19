@@ -147,9 +147,9 @@ class ResourceManager {
             return other._handl == this->_handl;
         }
 
-        T& operator*() { return _manager.get(_handl); }
+        TH operator*() { return _handl; }
 
-        T& operator->() { return *(*this); }
+        TH operator->() { return *(*this); }
 
        private:
         TH _handl;
