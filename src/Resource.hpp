@@ -30,7 +30,9 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
-    void setFlags(ResourceFlags flags) { _flags = _flags | flags; }
+    void setFlags(ResourceFlags flags) {
+        _flags = _flags | flags;
+    }
 
     void unsetFlag(ResourceFlags flags) {
         _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
@@ -90,13 +92,13 @@ class ResourceManager {
     TH create(std::string name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
-            _resources[_free_indexes.front()] = T(name, _nextid);
-            _resources[_free_indexes.front()].setFlags(ResourceFlags::NEW);
             index = _free_indexes.front();
+            _resources[index] = T(name, _nextid);
             _free_indexes.pop_front();
         } else {
             _resources.push_back(T(name, _nextid));
         }
+        _resources[index].setFlags(ResourceFlags::NEW);
         auto h = TH(_nextid, index);
         _nextid++;
         return h;

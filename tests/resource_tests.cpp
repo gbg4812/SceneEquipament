@@ -45,8 +45,8 @@ TEST(resource_tests, create_mesh_resource) {
     mg.destroy(h4);
 
     int i = 1;
-    for (auto& res : mg) {
-        ASSERT_EQ(res.getName(), "Mesh" + std::to_string(i));
+    for (auto res : mg) {
+        ASSERT_EQ(mg.get(res).getName(), "Mesh" + std::to_string(i));
         if (i == 3) i++;
         i++;
     }

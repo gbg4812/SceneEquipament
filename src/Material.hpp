@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include "Resource.hpp"
 #include "Shader.hpp"
 
@@ -36,6 +37,12 @@ class Material : public Resource {
     template <ParameterTypes I>
     void setParameterValue(size_t pos, parm_vt_alt<I> value) {
         _parameters[pos] = value;
+    }
+
+    template <ParameterTypes I>
+    parm_vt_alt<I>
+    getParameterValue(size_t pos) {
+        return std::get<to_underlying(I)>(_parameters[pos]);
     }
 
     const std::vector<parm_vt>& getValues() { return _parameters; }
