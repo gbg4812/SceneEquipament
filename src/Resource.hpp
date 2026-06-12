@@ -30,9 +30,7 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
-    void setFlags(ResourceFlags flags) {
-        _flags = _flags | flags;
-    }
+    void setFlags(ResourceFlags flags) { _flags = _flags | flags; }
 
     void unsetFlag(ResourceFlags flags) {
         _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010

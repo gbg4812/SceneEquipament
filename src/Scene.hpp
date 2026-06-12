@@ -1,4 +1,5 @@
 #pragma once
+#include "Light.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "Model.hpp"
@@ -10,31 +11,31 @@ namespace gbg {
 
 class Scene {
    public:
-    Scene() { root = _st_mg.create("Root"); };
+    Scene() { root = st_mg.create("Root"); };
     Scene(Scene& other) = delete;
 
-    ResourceManager<Mesh, MeshHandle>& getMeshManager() { return _ms_mg; }
-    ResourceManager<Shader, ShaderHandle>& getShaderManager() { return _sh_mg; }
+    ResourceManager<Mesh, MeshHandle>& getMeshManager() { return ms_mg; }
+    ResourceManager<Shader, ShaderHandle>& getShaderManager() { return sh_mg; }
     ResourceManager<Material, MaterialHandle>& getMaterialManager() {
-        return _mat_mg;
+        return mat_mg;
     }
-    ResourceManager<Model, ModelHandle>& getModelManager() { return _md_mg; }
-    SceneTreeManager& getSceneTreeManager() { return _st_mg; }
-    ResourceManager<Camera, CameraHandle>& getCameraManager() { return _cm_mg; }
+    ResourceManager<Model, ModelHandle>& getModelManager() { return md_mg; }
+    SceneTreeManager& getSceneTreeManager() { return st_mg; }
+    ResourceManager<Camera, CameraHandle>& getCameraManager() { return cm_mg; }
     ResourceManager<Texture, TextureHandle>& getTextureManager() {
-        return _tx_mg;
+        return tx_mg;
     }
 
     SceneTreeHandle root;
 
-   private:
-    ResourceManager<Material, MaterialHandle> _mat_mg;
-    ResourceManager<Shader, ShaderHandle> _sh_mg;
-    ResourceManager<Mesh, MeshHandle> _ms_mg;
-    ResourceManager<Model, ModelHandle> _md_mg;
-    ResourceManager<Camera, CameraHandle> _cm_mg;
-    ResourceManager<Texture, TextureHandle> _tx_mg;
-    SceneTreeManager _st_mg;
+    ResourceManager<Material, MaterialHandle> mat_mg;
+    ResourceManager<Shader, ShaderHandle> sh_mg;
+    ResourceManager<Mesh, MeshHandle> ms_mg;
+    ResourceManager<Model, ModelHandle> md_mg;
+    ResourceManager<Camera, CameraHandle> cm_mg;
+    ResourceManager<Texture, TextureHandle> tx_mg;
+    ResourceManager<Light, LightHandle> lh_mg;
+    SceneTreeManager st_mg;
 };
 
 }  // namespace gbg

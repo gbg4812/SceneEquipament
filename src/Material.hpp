@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+
 #include "Resource.hpp"
 #include "Shader.hpp"
 
@@ -19,13 +20,13 @@ class Material : public Resource {
         for (ParameterTypes parmT : shader.getParameters()) {
             switch (parmT) {
                 case FLOAT_PARM:
-                    _parameters.push_back(0.0f);
+                    _parameters.push_back(1.0f);
                     break;
                 case VEC2_PARM:
-                    _parameters.push_back(glm::vec2());
+                    _parameters.push_back(glm::vec2(1.0f));
                     break;
                 case VEC3_PARM:
-                    _parameters.push_back(glm::vec3());
+                    _parameters.push_back(glm::vec3(1.f));
                     break;
                 case TEXTURE_PARM:
                     _parameters.push_back(TextureHandle());
@@ -40,8 +41,7 @@ class Material : public Resource {
     }
 
     template <ParameterTypes I>
-    parm_vt_alt<I>
-    getParameterValue(size_t pos) {
+    parm_vt_alt<I> getParameterValue(size_t pos) {
         return std::get<to_underlying(I)>(_parameters[pos]);
     }
 
