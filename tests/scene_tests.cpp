@@ -39,7 +39,7 @@ TEST(scene_tests, create_resources) {
 
     MaterialHandle mth1 = mt_mg.create("Material");
     Material& mt = mt_mg.get(mth1);
-    mt.setShader(sh2, shader);
+    mt.setShader(sh2, shader, TextureHandle());
 
     auto& vals = mt.getValues();
 
@@ -62,7 +62,7 @@ TEST(scene_tests, scene_tree) {
     SceneTreeHandle rooth = st_mg.create("Root");
     st_mg.get(rooth).setResource(mdl);
 
-    for (int i = 0; i < 10 ;i++) {
+    for (int i = 0; i < 10; i++) {
         SceneTreeHandle child1h = st_mg.create("Child" + std::to_string(i));
         st_mg.get(child1h).setResource(mdl2);
         st_mg.prependChild(rooth, child1h);
@@ -72,7 +72,7 @@ TEST(scene_tests, scene_tree) {
 
     SceneTreeNode& fchild = st_mg.get(root.childH);
 
-    for (int i = 0; i < 10 ;i++) {
+    for (int i = 0; i < 10; i++) {
         SceneTreeHandle child1h = st_mg.create("Child1" + std::to_string(i));
         st_mg.get(child1h).setResource(mdl2);
         st_mg.prependChild(root.childH, child1h);
@@ -80,7 +80,8 @@ TEST(scene_tests, scene_tree) {
 
     ASSERT_EQ(mdl, root.getResourceH<SceneObjectTypes::MODEL>());
     int i = 9;
-    for(SceneTreeHandle nh = root.childH; nh != SceneTreeHandle(); nh = st_mg.get(nh).nextH) {
+    for (SceneTreeHandle nh = root.childH; nh != SceneTreeHandle();
+         nh = st_mg.get(nh).nextH) {
         SceneTreeNode& n = st_mg.get(nh);
         ASSERT_EQ(mdl2, n.getResourceH<SceneObjectTypes::MODEL>());
         ASSERT_EQ("Child" + std::to_string(i), n.getName());

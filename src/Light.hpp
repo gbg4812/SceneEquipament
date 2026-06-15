@@ -1,5 +1,6 @@
 #pragma once
 #include "Resource.hpp"
+#include "glm/vec3.hpp"
 namespace gbg {
 class Light : public Resource {
    public:

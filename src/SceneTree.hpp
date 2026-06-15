@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "Camera.hpp"
+#include "Light.hpp"
 #include "Model.hpp"
 #include "Resource.hpp"
 #include "gbg_traits.hpp"
@@ -15,9 +16,11 @@ enum SceneObjectTypes {
     EMPTY = 0,
     MODEL,
     CAMERA,
+    LIGHT,
 };
 
-typedef std::variant<std::monostate, ModelHandle, CameraHandle> scene_obj_vt;
+typedef std::variant<std::monostate, ModelHandle, CameraHandle, LightHandle>
+    scene_obj_vt;
 
 template <SceneObjectTypes I>
 using scene_obj_alt =
