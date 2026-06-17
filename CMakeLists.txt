@@ -33,8 +33,22 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glm)
 
+FetchContent_Declare (
+tracy
+GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+GIT_TAG master
+GIT_SHALLOW TRUE
+GIT_PROGRESS TRUE
+)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE glm::glm )
+option(TRACY_ENABLE " " ON)
+option(TRACY_ON_DEMAND " " ON)
+FetchContent_MakeAvailable(tracy)
+
+
+
+target_link_libraries(${PROJECT_NAME} INTERFACE glm::glm)
+target_link_libraries(${PROJECT_NAME} INTERFACE TracyClient)
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
   FetchContent_Declare(
@@ -61,6 +75,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     ${PROJECT_NAME}
     GTest::gtest_main
     glm::glm
+    TracyClient
 )
 
   add_executable(
@@ -74,6 +89,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     ${PROJECT_NAME}
     GTest::gtest_main
     glm::glm
+    TracyClient
 )
 
   add_executable(
@@ -87,6 +103,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     ${PROJECT_NAME}
     GTest::gtest_main
     glm::glm
+    TracyClient
 )
 
   add_executable(
@@ -100,6 +117,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     ${PROJECT_NAME}
     GTest::gtest_main
     glm::glm
+    TracyClient
 )
 
   add_executable(
@@ -113,6 +131,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     ${PROJECT_NAME}
     GTest::gtest_main
     glm::glm
+    TracyClient
 )
 
   include(GoogleTest)

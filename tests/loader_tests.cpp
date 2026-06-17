@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 
+
 #include "Mesh.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include "loaders/objLoader.hpp"
 
+#define TRACY_ENABLE 1
+#include "tracy/Tracy.hpp"
 using namespace gbg;
 
 std::ostream& operator<<(std::ostream& os, const glm::vec3 vec) {
@@ -62,4 +65,20 @@ TEST(loader_tests, loader_load) {
               24);
 
     std::cout << ms_mg.getAll()[0].getFaces() << std::endl;
+}
+
+TEST(loader_tests, loader_stress) {
+    ZoneScoped;
+    Scene sc;
+
+    auto& mt_mg = sc.getMaterialManager();
+    auto& md_mg = sc.getModelManager();
+    auto& ms_mg = sc.getMeshManager();
+    auto& st_mg = sc.getSceneTreeManager();
+
+    auto parent = st_mg.create("Root");
+
+    auto mth = mt_mg.create("Default Material");
+
+    objLoader("./data/sponza/sponza.obj", &sc, parent, mth);
 }

@@ -89,7 +89,7 @@ inline void parseVertexUV(const std::string& line, Mesh& mesh,
 
 inline void parseFace(const std::string& line, Mesh& mesh,
                       _parser_context& context) {
-    std::regex posnbs(R"(\s+(\d+)/(\d+)/(\d+))");
+    static std::regex posnbs(R"(\s+(\d+)/(\d+)/(\d+))");
 
     face_t face;
 
