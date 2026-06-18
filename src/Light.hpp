@@ -7,9 +7,9 @@ class Light : public Resource {
     Light() : Resource() {}
     Light(std::string name, uint32_t rid) : Resource(name, rid) {}
 
-    float intensity;
-    glm::vec3 color;
-    glm::vec3 direction;
+    float intensity = 0;
+    glm::vec3 color{};
+    glm::vec3 direction{};
 };
 
 class LightHandle : public ResourceHandle {
