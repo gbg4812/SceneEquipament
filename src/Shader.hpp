@@ -40,6 +40,11 @@ class Shader : public Resource {
         }
     }
 
+    void clear() {
+        _parameters.clear();
+        _attributes.clear();
+    }
+
     void removeAttribute(uint loc) { _attributes.erase(loc); }
 
     const std::vector<ParameterTypes>& getParameters() const {
@@ -55,6 +60,7 @@ class Shader : public Resource {
 
         char rdaux[64];
 
+        _frag_code.clear();
         while (ifs) {
             ifs.read(rdaux, 64);
             _frag_code.append(rdaux, ifs.gcount());
@@ -64,6 +70,7 @@ class Shader : public Resource {
     void loadVertShaderCode(std::string file_path) {
         std::ifstream ifs(file_path);
 
+        _vert_code.clear();
         char rdaux[64];
 
         while (ifs) {

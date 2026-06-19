@@ -42,11 +42,14 @@ class Mesh : public Resource {
         _attributes.insert({location, attr_vt_alt<I>(_nvertices)});
     }
 
-    size_t addVertex() {
-        for (auto& attrb : _attributes) {
-            std::visit<void>(_DefaultVertex_V{}, attrb.second);
+    size_t addVertex(int n = 1) {
+        for (int i = 0; i < n; i++) {
+            for (auto& attrb : _attributes) {
+                std::visit<void>(_DefaultVertex_V{}, attrb.second);
+            }
+            ++_nvertices;
         }
-        return _nvertices++;
+        return _nvertices - 1;
     }
 
     const std::map<uint, attr_vt>& getAttributes() const { return _attributes; }
@@ -58,8 +61,8 @@ class Mesh : public Resource {
 
 class MeshHandle : public ResourceHandle {
    public:
-    MeshHandle() : ResourceHandle() {};
-    MeshHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {};
+    MeshHandle() : ResourceHandle(){};
+    MeshHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
 
 }  // namespace gbg
