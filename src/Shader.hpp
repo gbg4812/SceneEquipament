@@ -55,39 +55,23 @@ class Shader : public Resource {
         return _attributes;
     }
 
-    void loadFragShaderCode(std::string file_path) {
-        std::ifstream ifs(file_path);
-
-        char rdaux[64];
-
-        _frag_code.clear();
-        while (ifs) {
-            ifs.read(rdaux, 64);
-            _frag_code.append(rdaux, ifs.gcount());
-        }
+    void setFragShaderCode(std::vector<uint32_t> code) {
+        _frag_code = code;
     }
 
-    void loadVertShaderCode(std::string file_path) {
-        std::ifstream ifs(file_path);
-
-        _vert_code.clear();
-        char rdaux[64];
-
-        while (ifs) {
-            ifs.read(rdaux, 64);
-            _vert_code.append(rdaux, ifs.gcount());
-        }
+    void setVertShaderCode(std::vector<uint32_t> code) {
+        _vert_code = code;
     }
 
-    const std::string& getFragShaderCode() const { return _frag_code; }
+    const std::vector<uint32_t>& getFragShaderCode() const { return _frag_code; }
 
-    const std::string& getVertShaderCode() const { return _vert_code; }
+    const std::vector<uint32_t>& getVertShaderCode() const { return _vert_code; }
 
    private:
     std::vector<ParameterTypes> _parameters;
     std::map<uint, AttributeTypes> _attributes;
-    std::string _frag_code;
-    std::string _vert_code;
+    std::vector<uint32_t> _frag_code;
+    std::vector<uint32_t> _vert_code;
 };
 
 class ShaderHandle : public ResourceHandle {
