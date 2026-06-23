@@ -15,6 +15,7 @@ class Texture : public Resource {
     int width = 0;
     int height = 0;
     int mip_levels = 0;
+    bool raw = false;
 };
 
 class TextureHandle : public ResourceHandle {

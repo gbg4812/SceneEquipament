@@ -46,7 +46,7 @@ class Material : public Resource {
         return std::get<to_underlying(I)>(_parameters[pos]);
     }
 
-    const std::vector<parm_vt>& getValues() { return _parameters; }
+    const std::vector<parm_vt>& getValues() const { return _parameters; }
     ShaderHandle getShaderHandle() const { return _shaderh; }
 
    private:
