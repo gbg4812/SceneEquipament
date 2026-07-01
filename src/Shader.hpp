@@ -8,11 +8,12 @@
 #include "Resource.hpp"
 #include "Texture.hpp"
 #include "gbg_traits.hpp"
+#include "macros.hpp"
 
 namespace gbg {
-typedef std::variant<float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
+typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
-enum ParameterTypes { FLOAT_PARM = 0, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
+enum ParameterTypes { INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
@@ -72,6 +73,7 @@ class Shader : public Resource {
     std::map<uint, AttributeTypes> _attributes;
     std::vector<uint32_t> _frag_code;
     std::vector<uint32_t> _vert_code;
+    
 };
 
 class ShaderHandle : public ResourceHandle {
@@ -79,5 +81,7 @@ class ShaderHandle : public ResourceHandle {
     ShaderHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
     ShaderHandle() : ResourceHandle() {}
 };
+
+RESOURCE_MANAGER(Shader);
 
 }  // namespace gbg

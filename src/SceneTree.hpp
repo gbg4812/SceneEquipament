@@ -57,18 +57,13 @@ class SceneTreeNode : public Resource {
 
     glm::mat4 getLocalTransform() {
         glm::mat4 trans(1.0f);
+        glm::vec3 rot = glm::radians(rotation);
         trans = glm::translate(trans, translation);
-        trans = glm::rotate(trans, rotation.y, {0.0, 1.0, 0.0});
-        trans = glm::rotate(trans, rotation.x, {1.0, 0.0, 0.0});
-        trans = glm::rotate(trans, rotation.z, {0.0, 0.0, 1.0});
+        trans = glm::rotate(trans, rot.z, {0.0, 0.0, 1.0});
+        trans = glm::rotate(trans, rot.y, {0.0, 1.0, 0.0});
+        trans = glm::rotate(trans, rot.x, {1.0, 0.0, 0.0});
         trans = glm::scale(trans, scale);
         return trans;
-    }
-
-    void localTranslate(glm::vec3 offset) {
-        glm::mat4 trans(1.0f);
-        trans = glm::rotate(trans, rotation.y, {0.0, 1.0, 0.0});
-        translation += glm::vec3(trans * glm::vec4(offset, 1.));
     }
 
    private:
@@ -91,7 +86,7 @@ class SceneTreeManager
     glm::mat4 getGlobalTransform(SceneTreeHandle h) {
         SceneTreeNode& node = this->get(h);
         if (node.parentH)
-            return node.getLocalTransform() * getGlobalTransform(node.parentH);
+            return  node.getLocalTransform() * getGlobalTransform(node.parentH) ;
         else
             return node.getLocalTransform();
     }

@@ -6,6 +6,7 @@
 #include "AttributeTypes.hpp"
 #include "Resource.hpp"
 #include "gbg_traits.hpp"
+#include "macros.hpp"
 
 namespace gbg {
 
@@ -64,5 +65,7 @@ class MeshHandle : public ResourceHandle {
     MeshHandle() : ResourceHandle(){};
     MeshHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
+
+RESOURCE_MANAGER(Mesh);
 
 }  // namespace gbg

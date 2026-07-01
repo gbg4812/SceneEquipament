@@ -4,6 +4,7 @@
 
 #include "Resource.hpp"
 #include "Shader.hpp"
+#include "macros.hpp"
 
 namespace gbg {
 
@@ -20,6 +21,9 @@ class Material : public Resource {
         // TODO: centralize defaults
         for (ParameterTypes parmT : shader.getParameters()) {
             switch (parmT) {
+                case INT_PARM:
+                    _parameters.push_back(1);
+                    break;
                 case FLOAT_PARM:
                     _parameters.push_back(1.0f);
                     break;
@@ -59,5 +63,7 @@ class MaterialHandle : public ResourceHandle {
     MaterialHandle() : ResourceHandle(){};
     MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
+
+RESOURCE_MANAGER(Material);
 
 }  // namespace gbg

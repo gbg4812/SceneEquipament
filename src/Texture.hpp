@@ -2,6 +2,7 @@
 #include <span>
 
 #include "Resource.hpp"
+#include "macros.hpp"
 
 namespace gbg {
 class Texture : public Resource {
@@ -23,5 +24,7 @@ class TextureHandle : public ResourceHandle {
     TextureHandle() : ResourceHandle(){};
     TextureHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
 };
+
+RESOURCE_MANAGER(Texture);
 
 }  // namespace gbg

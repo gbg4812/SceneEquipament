@@ -122,6 +122,24 @@ inline void parseFace(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
+inline void parseLine(const std::string& line, Mesh& mesh,
+                      _parser_context& context) {
+    face_t face;
+
+    std::size_t pos_idx1, pos_idx2;
+    std::stringstream ss(line);
+    ss >> pos_idx1 >> pos_idx2;
+    size_t vert_idx1 = mesh.addVertex();
+    size_t vert_idx2 = mesh.addVertex();
+    auto& pos_attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(0);
+    pos_attr[vert_idx1] = context.positions[pos_idx1];
+    pos_attr[vert_idx2] = context.positions[pos_idx2];
+    face.push_back(vert_idx1);
+    face.push_back(vert_idx2);
+
+    mesh.createFace(face);
+}
+
 inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
                       MaterialHandle default_mat) {
     std::map<std::string,
@@ -131,6 +149,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
     dispatch["vn"] = parseVertexNormal;
     dispatch["vt"] = parseVertexUV;
     dispatch["f"] = parseFace;
+    dispatch["l"] = parseLine;
 
     std::ifstream fs(path);
     if (fs.fail()) return false;
