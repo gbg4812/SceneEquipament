@@ -36,6 +36,10 @@ class Resource {
         _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
     }
 
+    void clearFlags() {
+        _flags = 0;
+    }
+
     uint32_t getFlags() { return _flags; }
 
    private:

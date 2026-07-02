@@ -1,3 +1,4 @@
+#pragma once
 /*
  * 1. Llegir tota la info en 3 vectors
  * 2. Per cada vertex d'una cara buscar si ja existeix i sinó crear-lo.
@@ -122,13 +123,17 @@ inline void parseFace(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
+//Optimitzar!
 inline void parseLine(const std::string& line, Mesh& mesh,
                       _parser_context& context) {
     face_t face;
 
+    char c;
     std::size_t pos_idx1, pos_idx2;
     std::stringstream ss(line);
-    ss >> pos_idx1 >> pos_idx2;
+    ss  >> c >> pos_idx1 >> pos_idx2;
+    --pos_idx1;
+    --pos_idx2;
     size_t vert_idx1 = mesh.addVertex();
     size_t vert_idx2 = mesh.addVertex();
     auto& pos_attr = mesh.getAttribute<AttributeTypes::VEC3_ATTR>(0);

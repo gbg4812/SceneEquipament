@@ -15,6 +15,12 @@ typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
 enum ParameterTypes { INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
 
+enum PrimitiveInterpretation {
+    TRIANGLES,
+    POINTS,
+    LINES
+};
+
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
@@ -68,12 +74,14 @@ class Shader : public Resource {
 
     const std::vector<uint32_t>& getVertShaderCode() const { return _vert_code; }
 
+    PrimitiveInterpretation topology = TRIANGLES;
+
    private:
     std::vector<ParameterTypes> _parameters;
     std::map<uint, AttributeTypes> _attributes;
     std::vector<uint32_t> _frag_code;
     std::vector<uint32_t> _vert_code;
-    
+
 };
 
 class ShaderHandle : public ResourceHandle {
