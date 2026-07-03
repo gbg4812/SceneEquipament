@@ -64,7 +64,7 @@ class ResourceHandle {
         return (other._index == _index) and (other._rid == _rid);
     }
 
-    explicit operator bool() { return _rid != 0; }
+    explicit operator bool() const { return not (_rid == 0 or _index == 0); }
 };
 
 // Manager class to allocate and get instances of a type of resource
@@ -107,6 +107,7 @@ class ResourceManager {
     }
 
     T& get(const TH& handle) {
+        assert(handle.getIndex() != 0);
         assert(handle.getRID() == _resources[handle.getIndex()].getRID());
         return _resources[handle.getIndex()];
     }
@@ -115,6 +116,7 @@ class ResourceManager {
         assert(handle.getRID() == _resources[handle.getIndex()].getRID());
         return _resources[handle.getIndex()];
     }
+
     std::vector<T>& getAll() { return _resources; }
     void clear() {
         _resources.clear();

@@ -13,8 +13,7 @@ class Material : public Resource {
     Material() : Resource() {}
     Material(std::string name, uint32_t rid) : Resource(name, rid) {}
 
-    void setShader(ShaderHandle sh, const Shader& shader,
-                   TextureHandle defaultTexture) {
+    void setShader(ShaderHandle sh, const Shader& shader) {
         _parameters.clear();
         _shaderh = sh;
 
@@ -34,7 +33,7 @@ class Material : public Resource {
                     _parameters.push_back(glm::vec3(1.f));
                     break;
                 case TEXTURE_PARM:
-                    _parameters.push_back(defaultTexture);
+                    _parameters.push_back(TextureHandle());
                     break;
             }
         }

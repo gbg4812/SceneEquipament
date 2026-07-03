@@ -10,6 +10,7 @@
 
 namespace gbg {
 
+
 class Scene {
    public:
     Scene() { root = st_mg.create("Root"); };

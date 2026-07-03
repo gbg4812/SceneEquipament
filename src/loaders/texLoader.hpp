@@ -15,7 +15,6 @@ inline void loadTexture(std::string_view path, gbg::Scene* scene,
         delete texture.data.data();
     }
 
-    assert(texture.getRID() != 0);
 
     int channels;
     unsigned char* data =
