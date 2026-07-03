@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstdint>
 #include <list>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -115,6 +116,16 @@ class ResourceManager {
     T& getRelated(const ResourceHandle& handle) {
         assert(handle.getRID() == _resources[handle.getIndex()].getRID());
         return _resources[handle.getIndex()];
+    }
+
+    /*
+     * @warning Not eficient, makes a linear search!
+     */
+    T& getByName(std::string name) {
+        for(TH rh : *this) {
+            if(get(rh).getName() == name) return get(rh);
+        }
+        throw std::runtime_error("Resource by name: " + name + " does not exist!");
     }
 
     std::vector<T>& getAll() { return _resources; }
