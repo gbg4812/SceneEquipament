@@ -14,6 +14,7 @@ namespace gbg {
 typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
 enum ParameterTypes { INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
+static std::array<std::string_view, TEXTURE_PARM + 1> parmTypeToString =  {"int", "float", "vec2", "vec3", "texture"};
 
 enum PrimitiveInterpretation {
     TRIANGLES,
@@ -75,6 +76,7 @@ class Shader : public Resource {
     const std::vector<uint32_t>& getVertShaderCode() const { return _vert_code; }
 
     PrimitiveInterpretation topology = TRIANGLES;
+    bool shadow = true;
 
    private:
     std::vector<ParameterTypes> _parameters;

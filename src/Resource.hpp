@@ -107,6 +107,10 @@ class ResourceManager {
         return h;
     }
 
+    uint32_t nextID() const {
+        return _nextid;
+    }
+
     T& get(const TH& handle) {
         assert(handle.getIndex() != 0);
         assert(handle.getRID() == _resources[handle.getIndex()].getRID());
