@@ -16,6 +16,8 @@ struct SceneDefaults {
     MaterialHandle material;
     TextureHandle texture;
     MeshHandle mesh;
+    CameraHandle camera;
+    LightHandle light;
 };
 
 
