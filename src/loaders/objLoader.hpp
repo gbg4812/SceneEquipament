@@ -123,7 +123,7 @@ inline void parseFace(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
-//Optimitzar!
+// Optimitzar!
 inline void parseLine(const std::string& line, Mesh& mesh,
                       _parser_context& context) {
     face_t face;
@@ -131,7 +131,7 @@ inline void parseLine(const std::string& line, Mesh& mesh,
     char c;
     std::size_t pos_idx1, pos_idx2;
     std::stringstream ss(line);
-    ss  >> c >> pos_idx1 >> pos_idx2;
+    ss >> c >> pos_idx1 >> pos_idx2;
     --pos_idx1;
     --pos_idx2;
     size_t vert_idx1 = mesh.addVertex();

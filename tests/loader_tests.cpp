@@ -53,17 +53,15 @@ TEST(loader_tests, loader_load) {
 
     objLoader("./data/Cube.obj", &sc, parent, mth);
 
-    ASSERT_EQ(md_mg.getAll()[0].getName(), "Cube");
+    ASSERT_EQ(md_mg.getAll()[1].getName(), "Cube");
 
-    ASSERT_EQ(md_mg.getAll()[0].getMesh().getRID(), ms_mg.getAll()[0].getRID());
-    ASSERT_EQ(md_mg.getAll()[0].getMaterial().getRID(), mth.getRID());
+    ASSERT_EQ(md_mg.getAll()[1].getMesh().getRID(), ms_mg.getAll()[1].getRID());
+    ASSERT_EQ(md_mg.getAll()[1].getMaterial().getRID(), mth.getRID());
 
-    ASSERT_EQ(ms_mg.getAll()[0]
+    ASSERT_EQ(ms_mg.getAll()[1]
                   .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
                   .size(),
               24);
-
-    std::cout << ms_mg.getAll()[0].getFaces() << std::endl;
 }
 
 TEST(loader_tests, loader_stress) {

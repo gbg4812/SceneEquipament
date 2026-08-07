@@ -37,9 +37,7 @@ class Resource {
         _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
     }
 
-    void clearFlags() {
-        _flags = 0;
-    }
+    void clearFlags() { _flags = 0; }
 
     uint32_t getFlags() { return _flags; }
 
@@ -65,7 +63,7 @@ class ResourceHandle {
         return (other._index == _index) and (other._rid == _rid);
     }
 
-    explicit operator bool() const { return not (_rid == 0 or _index == 0); }
+    explicit operator bool() const { return not(_rid == 0 or _index == 0); }
 };
 
 // Manager class to allocate and get instances of a type of resource
@@ -82,7 +80,7 @@ class ResourceManager {
         "The Resource must be default constructible with a call to Resource()");
 
    public:
-    ResourceManager(size_t initial_size = 0) {
+    ResourceManager(size_t initial_size = 0) : _nextid(1) {
         _resources.reserve(initial_size + 1);
         _resources.push_back(T());
     }
@@ -107,9 +105,7 @@ class ResourceManager {
         return h;
     }
 
-    uint32_t nextID() const {
-        return _nextid;
-    }
+    uint32_t nextID() const { return _nextid; }
 
     T& get(const TH& handle) {
         assert(handle.getIndex() != 0);
@@ -126,10 +122,11 @@ class ResourceManager {
      * @warning Not eficient, makes a linear search!
      */
     T& getByName(std::string name) {
-        for(TH rh : *this) {
-            if(get(rh).getName() == name) return get(rh);
+        for (TH rh : *this) {
+            if (get(rh).getName() == name) return get(rh);
         }
-        throw std::runtime_error("Resource by name: " + name + " does not exist!");
+        throw std::runtime_error("Resource by name: " + name +
+                                 " does not exist!");
     }
 
     std::vector<T>& getAll() { return _resources; }
