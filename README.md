@@ -7,22 +7,33 @@ vertices.
 
 ## Current Features
 
+- The`ResourceManager` and `Resource` classes wich implement a memory pool and a generic
+  entity with a unique ID.
 - Representation of meshes with any number of point attributes.
 - Representation of shaders with dynamic number of parameters and input
   attributes.
 - Representation of Models and Scene Trees.
 - An incomplete .obj loader.
+- Representation of point lights
+- Representation of cameras
+- A dependency tree to track dependencies between resources
 
 ## Technology note
 
 It relays on `std::variant` to implement the mesh attributes system and the
 material parameter system. Also, [glm](https://github.com/g-truc/glm.git) is
 used as math library.
+Also if follows a Data Oriented Design as all the resources are allocated continuously.
 
 ## Code example
 
 ```cpp
-    gbg::Mesh mesh;
+    gbg::Scene scene;
+
+    gbg::MeshManager& msh_mg = scene.getMeshManager();
+    gbg::MeshHandle msh = msh_mg.create("Mesh1");
+    gbg::Mesh& mesh = msh_mg.get(msh);
+
     using AT = gbg::AttributeTypes;
     mesh.createAttribute<AT::FLOAT_ATTR>(1);
     mesh.createAttribute<AT::VEC2_ATTR>(2);
