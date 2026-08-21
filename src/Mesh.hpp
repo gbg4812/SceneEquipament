@@ -4,7 +4,7 @@
 #include <variant>
 
 #include "AttributeTypes.hpp"
-#include "Resource.hpp"
+#include "DResource.hpp"
 #include "gbg_traits.hpp"
 #include "macros.hpp"
 
@@ -18,7 +18,7 @@ enum AttributeTypes { FLOAT_ATTR = 0, VEC2_ATTR, VEC3_ATTR };
 template <AttributeTypes I>
 using attr_vt_alt = std::variant_alternative_t<to_underlying(I), attr_vt>;
 
-class Mesh : public Resource {
+class Mesh : public DResource {
     std::map<uint, attr_vt> _attributes;
     std::vector<face_t> _faces;
     size_t _nvertices = 0;
@@ -30,8 +30,8 @@ class Mesh : public Resource {
     };
 
    public:
-    Mesh() : Resource() {}
-    Mesh(std::string name, uint32_t rid) : Resource(name, rid) {}
+    Mesh() : DResource() {}
+    Mesh(std::string name, uint32_t rid) : DResource(name, rid) {}
 
     template <AttributeTypes I>
     attr_vt_alt<I>& getAttribute(uint location) {
@@ -60,12 +60,8 @@ class Mesh : public Resource {
     const std::vector<face_t>& getFaces() const { return _faces; }
 };
 
-class MeshHandle : public ResourceHandle {
-   public:
-    MeshHandle() : ResourceHandle(){};
-    MeshHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
-};
 
+RESOURCE_HANDLE(Mesh);
 RESOURCE_MANAGER(Mesh);
 
 }  // namespace gbg

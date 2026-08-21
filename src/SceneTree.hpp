@@ -6,13 +6,14 @@
 #include "Camera.hpp"
 #include "Light.hpp"
 #include "Model.hpp"
-#include "Resource.hpp"
+#include "DResource.hpp"
 #include "gbg_traits.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "macros.hpp"
 
 namespace gbg {
 
-enum SceneObjectTypes {
+enum class SceneObjectTypes {
     EMPTY = 0,
     MODEL,
     CAMERA,
@@ -26,17 +27,13 @@ template <SceneObjectTypes I>
 using scene_obj_alt =
     std::variant_alternative_t<to_underlying(I), scene_obj_vt>;
 
-struct SceneTreeHandle : public ResourceHandle {
-    SceneTreeHandle() : ResourceHandle() {}
-    SceneTreeHandle(size_t _nextid) : ResourceHandle() {}
-    SceneTreeHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
-};
+RESOURCE_HANDLE(SceneTree);
 
-class SceneTreeNode : public Resource {
+class SceneTreeNode : public DResource {
     // TODO: rid 0 vol dir que és null
    public:
-    SceneTreeNode() : Resource(){};
-    SceneTreeNode(std::string name, uint32_t rid) : Resource(name, rid) {}
+    SceneTreeNode() : DResource(){};
+    SceneTreeNode(std::string name, uint32_t rid) : DResource(name, rid) {}
 
     template <SceneObjectTypes I>
     scene_obj_alt<I> getResourceH() {

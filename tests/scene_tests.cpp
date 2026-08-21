@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "Material.hpp"
+#include "MaterialFunctions.hpp"
 #include "Mesh.hpp"
 #include "Model.hpp"
 #include "Scene.hpp"
@@ -39,7 +40,9 @@ TEST(scene_tests, create_resources) {
 
     MaterialHandle mth1 = mt_mg.create("Material");
     Material& mt = mt_mg.get(mth1);
-    mt.setShader(sh2, shader);
+    mt.setShader(sh2);
+
+    setParametersFromShader(sc, mt);
 
     auto& vals = mt.getValues();
 

@@ -10,7 +10,6 @@
 
 namespace gbg {
 
-    
 struct SceneDefaults {
     ShaderHandle shader;
     MaterialHandle material;
@@ -19,7 +18,6 @@ struct SceneDefaults {
     CameraHandle camera;
     LightHandle light;
 };
-
 
 class Scene {
    public:
@@ -47,7 +45,6 @@ class Scene {
     SceneTreeManager st_mg;
 
     SceneDefaults defaults;
-    
 };
 
 }  // namespace gbg

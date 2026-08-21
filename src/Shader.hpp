@@ -1,11 +1,10 @@
 #pragma once
 
-#include <fstream>
 #include <variant>
 
 #include "Mesh.hpp"
 #include "ParameterTypes.hpp"
-#include "Resource.hpp"
+#include "DResource.hpp"
 #include "Texture.hpp"
 #include "gbg_traits.hpp"
 #include "macros.hpp"
@@ -13,8 +12,10 @@
 namespace gbg {
 typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
-enum ParameterTypes { INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM };
-inline std::array<std::string_view, TEXTURE_PARM + 1> parmTypeToString =  {"int", "float", "vec2", "vec3", "texture"};
+enum ParameterTypes {
+    INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM
+};
+inline std::array<std::string_view, to_underlying(ParameterTypes::TEXTURE_PARM) + 1> parmTypeToString =  {"int", "float", "vec2", "vec3", "texture"};
 
 enum PrimitiveInterpretation {
     TRIANGLES,
@@ -25,10 +26,10 @@ enum PrimitiveInterpretation {
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
-class Shader : public Resource {
+class Shader : public DResource {
    public:
-    Shader() : Resource(){};
-    Shader(std::string name, uint32_t rid) : Resource(name, rid){};
+    Shader() : DResource(){};
+    Shader(std::string name, uint32_t rid) : DResource(name, rid){};
 
     // returns the position
     size_t addParameter(ParameterTypes I) {
@@ -86,11 +87,7 @@ class Shader : public Resource {
 
 };
 
-class ShaderHandle : public ResourceHandle {
-   public:
-    ShaderHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index) {}
-    ShaderHandle() : ResourceHandle() {}
-};
+RESOURCE_HANDLE(Shader);
 
 RESOURCE_MANAGER(Shader);
 

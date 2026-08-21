@@ -9,12 +9,7 @@
 
 namespace gbg {
 
-enum ResourceFlags {
-    DIRTY = 1 << 0,
-    INVISIBLE = 1 << 1,
-    NEW = 1 << 2,
-    DELETED = 1 << 3,
-};
+
 
 // base class for any resource
 class Resource {
@@ -31,20 +26,10 @@ class Resource {
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
 
-    void setFlags(ResourceFlags flags) { _flags = _flags | flags; }
-
-    void unsetFlag(ResourceFlags flags) {
-        _flags = _flags & (~flags);  // 1010 0010 -> 1101 & 1010
-    }
-
-    void clearFlags() { _flags = 0; }
-
-    uint32_t getFlags() { return _flags; }
 
    private:
     std::string _name;
     uint32_t _rid = 0;
-    uint32_t _flags = 0;
 };
 
 // identifies a resource
@@ -99,7 +84,6 @@ class ResourceManager {
         } else {
             _resources.push_back(T(name, _nextid));
         }
-        _resources[index].setFlags(ResourceFlags::NEW);
         auto h = TH(_nextid, index);
         _nextid++;
         return h;

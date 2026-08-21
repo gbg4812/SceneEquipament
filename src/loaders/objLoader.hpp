@@ -10,7 +10,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <ostream>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -145,7 +144,10 @@ inline void parseLine(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
-inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
+/* Loads all the models in a .obj file and hangs them from the parent
+ * @return a list of handles to all the scene nodes added
+ */
+inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
                       MaterialHandle default_mat) {
     std::map<std::string,
              void (*)(const std::string&, Mesh&, _parser_context& context)>
@@ -157,7 +159,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
     dispatch["l"] = parseLine;
 
     std::ifstream fs(path);
-    if (fs.fail()) return false;
+    if (fs.fail()) return std::list<SceneTreeHandle>();
 
     auto& md_mg = scene->getModelManager();
     auto& ms_mg = scene->getMeshManager();
@@ -165,6 +167,8 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
 
     ModelHandle mdh;
     MeshHandle msh;
+
+    std::list<SceneTreeHandle> added;
 
     std::string line;
     _parser_context context{};
@@ -178,6 +182,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
             ss >> name;
             mdh = md_mg.create(name);
             SceneTreeHandle child = st_mg.create(name);
+            added.push_back(child);
             st_mg.get(child).setResource(mdh);
             st_mg.prependChild(parent, child);
             msh = ms_mg.create("Mesh0");
@@ -187,7 +192,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
             Mesh& msh_i = ms_mg.get(msh);
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
             msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
-            msh_i.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // normal
+            msh_i.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
 
             context.vertices.clear();
 
@@ -199,7 +204,7 @@ inline bool objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
             }
         }
     }
-    return true;
+    return added;
 }
 
 }  // namespace gbg

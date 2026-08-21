@@ -1,12 +1,14 @@
+#pragma once
 #include <numbers>
 #include "Resource.hpp"
+#include "DResource.hpp"
 #include "glm/trigonometric.hpp"
 
 namespace gbg {
-class Camera : public Resource {
+class Camera : public DResource {
     public:
-    Camera() : Resource(){}
-    Camera(std::string name, uint32_t rid): Resource(name, rid){};
+    Camera() : DResource(){}
+    Camera(std::string name, uint32_t rid): DResource(name, rid){};
 
     float fov = glm::radians(std::numbers::pi/2.0f);
     float znear = 0.1f;

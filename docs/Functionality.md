@@ -14,7 +14,9 @@
   - Model (mesh + material)
   - Light
   - Camera
-  - For now this three...
+  - Textures
+  - ...
+- A way to register changes to update dependent resources with pressision.
 
 ## Dynamic dispatch technique
 
@@ -94,14 +96,25 @@ Utilitzarem Handles i Pools per allocar-los i referenciar-los.
 ## What if there is not DepDataHandle
 
 Example renderer and models:
-Renderer has a pool of vkModels (if that exists) where each vkModel has the same index than the corresponding 
+Renderer has a pool of vkModels (if that exists) where each vkModel has the same index than the corresponding
 Model. If Model is not visible (it does not need to have memory allocated to the GPU) the corresponding vkModel
-can have invalid (empty) handles to the GPU resources so it only occupies RAM. 
-To do this vkModel should be a Resource Also? Only for security (checking id is the same) and 
-reusability of the pulls but it is not required. If it were to be a Resource i need to find 
-a way of creating resources based of an index and id of another resource. Problems: checking the 
+can have invalid (empty) handles to the GPU resources so it only occupies RAM.
+To do this vkModel should be a Resource Also? Only for security (checking id is the same) and
+reusability of the pulls but it is not required. If it were to be a Resource i need to find
+a way of creating resources based of an index and id of another resource. Problems: checking the
 id is free (not a problem if theoretically is an exact copy of another pool which is coherent),
 if the original pool changes size... (should be checked before using and resized accordingly(maybe latter?)).
 Maybe it is not needed as new instances would be marked as new so they would be just created in the other pool.
 
 (Dependent pools?)
+
+## Design of the Dependency Tree
+
+I want to be able to mark all the resources depending on another resource as modified and queue them for modification.
+It would be good to have a mask of events to listen.
+
+1. create a directed graph of dependencies.
+2. when a node is flagged all dependent nodes should be flagged.
+3. we should find a update order where the parents are allways before the suns.
+
+will have a counter of modified parents when it reaches 0 it is candidate for queuing

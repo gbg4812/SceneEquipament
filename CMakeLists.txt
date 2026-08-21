@@ -134,6 +134,20 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
+add_executable(
+  dependency_tests
+  tests/dependency_tests.cpp
+)
+
+target_link_libraries(
+  dependency_tests
+  PRIVATE
+  ${PROJECT_NAME}
+  GTest::gtest_main
+  glm::glm
+  TracyClient
+)
+
   include(GoogleTest)
 
   gtest_discover_tests(resource_tests)
@@ -141,6 +155,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
   gtest_discover_tests(material_tests)
   gtest_discover_tests(scene_tests)
   gtest_discover_tests(loader_tests)
+  gtest_discover_tests(dependency_tests)
 
   file(CREATE_LINK ${CMAKE_SOURCE_DIR}/tests/data ${CMAKE_BINARY_DIR}/data SYMBOLIC)
 endif()

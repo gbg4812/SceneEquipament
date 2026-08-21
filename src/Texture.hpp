@@ -1,14 +1,14 @@
 #pragma once
 #include <span>
 
-#include "Resource.hpp"
+#include "DResource.hpp"
 #include "macros.hpp"
 
 namespace gbg {
-class Texture : public Resource {
+class Texture : public DResource {
    public:
-    Texture() : Resource() {}
-    Texture(std::string name, uint32_t rid) : Resource(name, rid) {}
+    Texture() : DResource() {}
+    Texture(std::string name, uint32_t rid) : DResource(name, rid) {}
 
    public:
     std::string path;
@@ -19,12 +19,8 @@ class Texture : public Resource {
     bool raw = false;
 };
 
-class TextureHandle : public ResourceHandle {
-    public:
-    TextureHandle() : ResourceHandle(){};
-    TextureHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
-};
 
+RESOURCE_HANDLE(Texture);
 RESOURCE_MANAGER(Texture);
 
 }  // namespace gbg

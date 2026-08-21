@@ -2,41 +2,28 @@
 
 #include <utility>
 
-#include "Resource.hpp"
+#include "DResource.hpp"
 #include "Shader.hpp"
 #include "macros.hpp"
 
 namespace gbg {
 
-class Material : public Resource {
+class Material : public DResource {
    public:
-    Material() : Resource() {}
-    Material(std::string name, uint32_t rid) : Resource(name, rid) {}
+    Material() : DResource() {}
+    Material(std::string name, uint32_t rid) : DResource(name, rid) {}
 
-    void setShader(ShaderHandle sh, const Shader& shader) {
-        _parameters.clear();
+    void setShader(ShaderHandle sh) {
         _shaderh = sh;
+    }
 
-        // TODO: centralize defaults
-        for (ParameterTypes parmT : shader.getParameters()) {
-            switch (parmT) {
-                case INT_PARM:
-                    _parameters.push_back(1);
-                    break;
-                case FLOAT_PARM:
-                    _parameters.push_back(1.0f);
-                    break;
-                case VEC2_PARM:
-                    _parameters.push_back(glm::vec2(1.0f));
-                    break;
-                case VEC3_PARM:
-                    _parameters.push_back(glm::vec3(1.f));
-                    break;
-                case TEXTURE_PARM:
-                    _parameters.push_back(TextureHandle());
-                    break;
-            }
-        }
+    void clearParameters() {
+        _parameters.clear();
+    }
+
+
+    void appendParameter(parm_vt init_value) {
+        _parameters.push_back(init_value);
     }
 
     template <ParameterTypes I>
@@ -57,12 +44,9 @@ class Material : public Resource {
     ShaderHandle _shaderh;
 };
 
-class MaterialHandle : public ResourceHandle {
-   public:
-    MaterialHandle() : ResourceHandle(){};
-    MaterialHandle(uint32_t rid, size_t index) : ResourceHandle(rid, index){};
-};
+RESOURCE_HANDLE(Material);
 
 RESOURCE_MANAGER(Material);
+
 
 }  // namespace gbg
