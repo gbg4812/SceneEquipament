@@ -180,12 +180,12 @@ inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene, Scen
         if (type == "o") {
             std::string name;
             ss >> name;
-            mdh = md_mg.create(name);
-            SceneTreeHandle child = st_mg.create(name);
+            mdh = md_mg.create(name).getHandle();
+            SceneTreeHandle child = st_mg.create(name).getHandle();
             added.push_back(child);
             st_mg.get(child).setResource(mdh);
             st_mg.prependChild(parent, child);
-            msh = ms_mg.create("Mesh0");
+            msh = ms_mg.create("Mesh0").getHandle();
 
             md_mg.get(mdh).setMesh(msh);
             md_mg.get(mdh).setMaterial(default_mat);

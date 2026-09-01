@@ -3,7 +3,10 @@
 #include "DResource.hpp"
 #include "macros.hpp"
 namespace gbg {
-class Light : public DResource {
+    
+RESOURCE_HANDLE(Light);
+
+class Light : public DResource<LightHandle> {
    public:
     Light() : DResource() {}
     Light(std::string name, uint32_t rid) : DResource(name, rid) {}
@@ -13,7 +16,6 @@ class Light : public DResource {
     glm::vec3 direction;
 };
 
-RESOURCE_HANDLE(Light);
 
 RESOURCE_MANAGER(Light);
 

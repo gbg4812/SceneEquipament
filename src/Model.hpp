@@ -1,12 +1,14 @@
 #pragma once
+#include "DResource.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
-#include "DResource.hpp"
 #include "macros.hpp"
 
 namespace gbg {
 
-class Model : public DResource {
+RESOURCE_HANDLE(Model);
+
+class Model : public DResource<ModelHandle> {
    public:
     Model() : DResource(){};
     Model(std::string name, uint32_t rid) : DResource(name, rid){};
@@ -22,8 +24,6 @@ class Model : public DResource {
     MaterialHandle _material;
 };
 
-RESOURCE_HANDLE(Model);
 RESOURCE_MANAGER(Model);
-
 
 }  // namespace gbg

@@ -21,7 +21,7 @@ struct SceneDefaults {
 
 class Scene {
    public:
-    Scene() { root = st_mg.create("Root"); };
+    Scene() { root = st_mg.create("Root").getHandle(); };
     Scene(Scene& other) = delete;
 
     MeshManager& getMeshManager() { return ms_mg; }

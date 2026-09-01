@@ -8,19 +8,16 @@
 
 namespace gbg {
 
-class Material : public DResource {
+RESOURCE_HANDLE(Material);
+
+class Material : public DResource<MaterialHandle> {
    public:
     Material() : DResource() {}
     Material(std::string name, uint32_t rid) : DResource(name, rid) {}
 
-    void setShader(ShaderHandle sh) {
-        _shaderh = sh;
-    }
+    void setShader(ShaderHandle sh) { _shaderh = sh; }
 
-    void clearParameters() {
-        _parameters.clear();
-    }
-
+    void clearParameters() { _parameters.clear(); }
 
     void appendParameter(parm_vt init_value) {
         _parameters.push_back(init_value);
@@ -44,9 +41,6 @@ class Material : public DResource {
     ShaderHandle _shaderh;
 };
 
-RESOURCE_HANDLE(Material);
-
 RESOURCE_MANAGER(Material);
-
 
 }  // namespace gbg

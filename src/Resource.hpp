@@ -10,12 +10,37 @@
 namespace gbg {
 
 
+#define BUILD_ID(gen, idx) (gen << 20) | (idx & 0x000FFFFF)
+#define GEN(rid) (rid >> 20)
+#define INDEX(rid) (rid & 0x000FFFFF)
+
+
+// identifies a resource
+class ResourceHandle {
+    uint32_t _rid = 0;
+
+   public:
+    ResourceHandle(uint32_t rid) : _rid(rid)  {}
+    ResourceHandle() : _rid(0){};
+    uint32_t getRID() const { return _rid; }
+    uint32_t getIndex() const { return INDEX(_rid); }
+    uint32_t getGen() const { return GEN(_rid); }
+    bool empty() { return _rid == 0; }
+
+    bool operator==(const ResourceHandle& other) const {
+        return (other._rid == _rid);
+    }
+
+    explicit operator bool() const { return INDEX(_rid); }
+};
 
 // base class for any resource
+template <typename TH>
 class Resource {
    public:
     // TODO: rid 0 vol dir que és null
-    Resource(){};
+    Resource(){}
+    Resource(uint32_t rid) : _rid(rid) {}
     Resource(std::string name, uint32_t rid) : _name(name), _rid(rid) {}
 
     Resource(const Resource& other) = delete;
@@ -25,38 +50,20 @@ class Resource {
 
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
-
+    TH getHandle() const {return _rid; }
 
    private:
     std::string _name;
     uint32_t _rid = 0;
 };
 
-// identifies a resource
-class ResourceHandle {
-    uint32_t _rid = 0;
-    size_t _index = 0;
-
-   public:
-    ResourceHandle(uint32_t rid, size_t index) : _rid(rid), _index(index) {}
-    ResourceHandle() : _rid(0), _index(0){};
-    uint32_t getRID() const { return _rid; }
-    uint32_t getIndex() const { return _index; }
-    bool empty() { return _rid == 0; }
-
-    bool operator==(const ResourceHandle& other) const {
-        return (other._index == _index) and (other._rid == _rid);
-    }
-
-    explicit operator bool() const { return not(_rid == 0 or _index == 0); }
-};
 
 // Manager class to allocate and get instances of a type of resource
 template <typename T, typename TH>
 class ResourceManager {
     static_assert(std::is_base_of_v<ResourceHandle, TH>,
                   "The ResourceHandle type must be based of ResourceHandle");
-    static_assert(std::is_base_of_v<Resource, T>,
+    static_assert(std::is_base_of_v<Resource<TH>, T>,
                   "The Resource type must be based of Resource");
     static_assert(std::is_constructible_v<T, std::string, uint32_t>,
                   "The Resource must have this constructor");
@@ -65,7 +72,7 @@ class ResourceManager {
         "The Resource must be default constructible with a call to Resource()");
 
    public:
-    ResourceManager(size_t initial_size = 0) : _nextid(1) {
+    ResourceManager(size_t initial_size = 0) {
         _resources.reserve(initial_size + 1);
         _resources.push_back(T());
     }
@@ -75,30 +82,29 @@ class ResourceManager {
     ResourceManager(ResourceManager&& other) = default;
     ResourceManager& operator=(ResourceManager&& other) = default;
 
-    TH create(std::string name) {
+    T& create(std::string name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
             index = _free_indexes.front();
-            _resources[index] = T(name, _nextid);
+            _resources[index] = T(name, BUILD_ID(_resources[index].getHandle().getGen(), index));
             _free_indexes.pop_front();
         } else {
-            _resources.push_back(T(name, _nextid));
+            _resources.push_back(T(name, BUILD_ID(0, index)));
         }
-        auto h = TH(_nextid, index);
-        _nextid++;
-        return h;
+        return _resources[index];
     }
 
-    uint32_t nextID() const { return _nextid; }
+    T& create(TH handle) {
+        if(handle.getIndex() < _resources.size())
+            _resources.resize(handle.getIndex() + 1);
+        else
+            assert(not _resources[handle.getIndex()].getHandle()); // enshure we are creating on an empty spot
+        _resources[handle.getIndex()] = T(handle.getRID());
+    }
 
-    T& get(const TH& handle) {
+    T& get(TH handle) {
         assert(handle.getIndex() != 0);
-        assert(handle.getRID() == _resources[handle.getIndex()].getRID());
-        return _resources[handle.getIndex()];
-    }
-
-    T& getRelated(const ResourceHandle& handle) {
-        assert(handle.getRID() == _resources[handle.getIndex()].getRID());
+        assert(handle == _resources[handle.getIndex()].getHandle());
         return _resources[handle.getIndex()];
     }
 
@@ -118,8 +124,10 @@ class ResourceManager {
         _resources.clear();
         while (!_free_indexes.empty()) _free_indexes.pop_front();
     }
-    void destroy(const TH& handle) {
-        _resources[handle.getIndex()] = T();
+    void destroy(TH handle) {
+        assert(handle.getIndex() != 0);
+        assert(handle == _resources[handle.getIndex()].getHandle());
+        _resources[handle.getIndex()] = T(BUILD_ID(handle.getGen() + 1, 0));
         _free_indexes.push_front(handle.getIndex());
     }
 
@@ -137,11 +145,11 @@ class ResourceManager {
         iterator& operator++() {
             size_t index = _handl.getIndex() + 1;
             while (index < _manager._resources.size() &&
-                   _manager._resources[index].getRID() == 0) {
+                   _manager._resources[index].getHandle()) {
                 index++;
             }
             if (index >= _manager._resources.size()) index = 0;
-            _handl = TH(_manager._resources[index].getRID(), index);
+            _handl = _manager._resources[index].getHandle();
             return *this;
         };
 
@@ -169,8 +177,6 @@ class ResourceManager {
    private:
     std::vector<T> _resources;
     std::list<size_t> _free_indexes;
-    // 0 is reserved
-    uint32_t _nextid = 1;
 };
 
 }  // namespace gbg

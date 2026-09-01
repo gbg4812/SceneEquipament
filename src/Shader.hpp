@@ -26,7 +26,9 @@ enum PrimitiveInterpretation {
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
-class Shader : public DResource {
+RESOURCE_HANDLE(Shader);
+
+class Shader : public DResource<ShaderHandle> {
    public:
     Shader() : DResource(){};
     Shader(std::string name, uint32_t rid) : DResource(name, rid){};
@@ -87,7 +89,6 @@ class Shader : public DResource {
 
 };
 
-RESOURCE_HANDLE(Shader);
 
 RESOURCE_MANAGER(Shader);
 

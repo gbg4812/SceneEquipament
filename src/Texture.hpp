@@ -5,7 +5,10 @@
 #include "macros.hpp"
 
 namespace gbg {
-class Texture : public DResource {
+
+RESOURCE_HANDLE(Texture);
+
+class Texture : public DResource<TextureHandle> {
    public:
     Texture() : DResource() {}
     Texture(std::string name, uint32_t rid) : DResource(name, rid) {}
@@ -19,8 +22,6 @@ class Texture : public DResource {
     bool raw = false;
 };
 
-
-RESOURCE_HANDLE(Texture);
 RESOURCE_MANAGER(Texture);
 
 }  // namespace gbg

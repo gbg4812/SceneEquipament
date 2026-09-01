@@ -93,6 +93,16 @@ alocar i desalocar controladament.
 
 Utilitzarem Handles i Pools per allocar-los i referenciar-los.
 
+## Handles
+
+Until recently there where id and index separately but we could do what everyone does: index + generation in a single number!
+lets do it!
+
+| 32 bits (uint32_t) | 12 -> generation (2^12 = 4,096) |
+| ------------------ | ------------------------------- |
+|                    | 20 -> index (2^20 = 1,048,576)  |
+| We will be ok!     |                                 |
+
 ## What if there is not DepDataHandle
 
 Example renderer and models:

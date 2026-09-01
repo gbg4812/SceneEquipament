@@ -3,9 +3,13 @@
 #include "Resource.hpp"
 #include "DResource.hpp"
 #include "glm/trigonometric.hpp"
+#include "macros.hpp"
 
 namespace gbg {
-class Camera : public DResource {
+
+RESOURCE_HANDLE(Camera);
+    
+class Camera : public DResource<CameraHandle> {
     public:
     Camera() : DResource(){}
     Camera(std::string name, uint32_t rid): DResource(name, rid){};
@@ -15,10 +19,5 @@ class Camera : public DResource {
     float zfar = 100.0f;
 };
 
-class CameraHandle : public ResourceHandle {
-    public:
-    CameraHandle() : ResourceHandle(){};
-    CameraHandle(uint32_t rid,size_t index ) : ResourceHandle(rid, index){};
-};
 
 }

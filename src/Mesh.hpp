@@ -18,7 +18,9 @@ enum AttributeTypes { FLOAT_ATTR = 0, VEC2_ATTR, VEC3_ATTR };
 template <AttributeTypes I>
 using attr_vt_alt = std::variant_alternative_t<to_underlying(I), attr_vt>;
 
-class Mesh : public DResource {
+RESOURCE_HANDLE(Mesh);
+
+class Mesh : public DResource<MeshHandle> {
     std::map<uint, attr_vt> _attributes;
     std::vector<face_t> _faces;
     size_t _nvertices = 0;
@@ -61,7 +63,6 @@ class Mesh : public DResource {
 };
 
 
-RESOURCE_HANDLE(Mesh);
 RESOURCE_MANAGER(Mesh);
 
 }  // namespace gbg
