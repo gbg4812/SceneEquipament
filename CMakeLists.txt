@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(UNIX)
-  set( CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O0 -Wall" )
+  set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O0 -Wall -gdwarf-4" )
 elseif( WIN32 )
   ##
 endif()

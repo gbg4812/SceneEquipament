@@ -8,7 +8,7 @@ namespace gbg {
 
 RESOURCE_HANDLE(Texture);
 
-class Texture : public DResource {
+class Texture : public DResource<TextureHandle> {
    public:
     DRESOURCE_CONSTR(Texture)
 

@@ -6,7 +6,7 @@ namespace gbg {
 
 RESOURCE_HANDLE(Light);
 
-class Light : public DResource {
+class Light : public DResource<LightHandle> {
    public:
     DRESOURCE_CONSTR(Light)
 

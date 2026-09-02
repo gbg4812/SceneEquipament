@@ -10,7 +10,7 @@ namespace gbg {
 
 RESOURCE_HANDLE(Camera);
 
-class Camera : public DResource {
+class Camera : public DResource<CameraHandle> {
    public:
     DRESOURCE_CONSTR(Camera)
 

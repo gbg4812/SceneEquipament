@@ -4,9 +4,12 @@
 #include "macros.hpp"
 
 namespace gbg {
-class DResource : public Resource {
+template <typename TH>
+class DResource : public Resource<TH> {
    public:
-    RESOURCE_CONSTR(DResource)
+    DResource() : Resource<TH>(){};
+    DResource(uint32_t rid) : Resource<TH>(rid){};
+    DResource(std ::string name, uint32_t rid) : Resource<TH>(name, rid){};
 
    public:
     DependencyTreeNodeHandle representative;

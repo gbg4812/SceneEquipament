@@ -10,7 +10,7 @@ namespace gbg {
 
 RESOURCE_HANDLE(Material);
 
-class Material : public DResource {
+class Material : public DResource<MaterialHandle> {
    public:
     DRESOURCE_CONSTR(Material)
 

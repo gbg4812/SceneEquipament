@@ -9,12 +9,16 @@
 using namespace gbg;
 
 TEST(resource_tests, create_resource) {
-    ResourceManager<Resource, ResourceHandle> mg;
+    ResourceManager<Resource<ResourceHandle>, ResourceHandle> mg;
     // ou ou ou la referènci a r1 mor per culpa del relocació. per arreglar-ho
     // he allargat la mida inicial a 20 (és dificil que algu es guardi 20
     // referencies alhora no?)
-    auto& r1 = mg.create("Resource1");
-    auto& r2 = mg.create("Resource2");
+    // millor tornem a handles igualment
+    auto h1 = mg.create("Resource1");
+    auto h2 = mg.create("Resource2");
+
+    auto& r1 = mg.get(h1);
+    auto& r2 = mg.get(h2);
 
     std::cout << r1.getName() << std::endl;
 
@@ -24,8 +28,11 @@ TEST(resource_tests, create_resource) {
 
 TEST(resource_tests, create_mesh_resource) {
     ResourceManager<Mesh, MeshHandle> mg;
-    auto& m1 = mg.create("Mesh1");
-    auto& m2 = mg.create("Mesh2");
+    auto h1 = mg.create("Mesh1");
+    auto h2 = mg.create("Mesh2");
+    
+    auto& m1 = mg.get(h1);
+    auto& m2 = mg.get(h2);
 
     m1.addVertex();
     m1.addVertex();
@@ -40,7 +47,8 @@ TEST(resource_tests, create_mesh_resource) {
     m1.createFace({0, 0, 1});
 
     mg.create("Mesh3");
-    auto& m4 = mg.create("Mesh4");
+    auto h4 = mg.create("Mesh4");
+    auto& m4 = mg.get(h4);
     mg.create("Mesh5");
     mg.create("Mesh6");
     mg.destroy(m4.getRID());

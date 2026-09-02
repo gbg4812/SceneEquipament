@@ -30,7 +30,7 @@ using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 RESOURCE_HANDLE(Shader);
 
-class Shader : public DResource {
+class Shader : public DResource<ShaderHandle> {
    public:
     DRESOURCE_CONSTR(Shader)
 

@@ -12,10 +12,10 @@ TEST(dependency_tests, create_propagate) {
     gbg::DependencyTreeManager manager;
     gbg::Scene sc;
 
-    gbg::SceneTreeHandle e1 = sc.st_mg.create("Empty1").getRID();
-    gbg::SceneTreeHandle e2 = sc.st_mg.create("Empty2").getRID();
-    gbg::SceneTreeHandle e3 = sc.st_mg.create("Empty3").getRID();
-    gbg::SceneTreeHandle e4 = sc.st_mg.create("Empty4").getRID();
+    gbg::SceneTreeHandle e1 = sc.st_mg.create("Empty1");
+    gbg::SceneTreeHandle e2 = sc.st_mg.create("Empty2");
+    gbg::SceneTreeHandle e3 = sc.st_mg.create("Empty3");
+    gbg::SceneTreeHandle e4 = sc.st_mg.create("Empty4");
 
     gbg::createRepresentative(manager, e1, sc.st_mg, SCENE_TREE_NODE);
     gbg::createRepresentative(manager, e2, sc.st_mg, SCENE_TREE_NODE);

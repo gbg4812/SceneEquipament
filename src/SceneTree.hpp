@@ -29,7 +29,7 @@ using scene_obj_alt =
 
 RESOURCE_HANDLE(SceneTree);
 
-class SceneTreeNode : public DResource {
+class SceneTreeNode : public DResource<SceneTreeHandle> {
     // TODO: rid 0 vol dir que és null
    public:
     DRESOURCE_CONSTR(SceneTreeNode)

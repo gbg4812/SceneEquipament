@@ -8,7 +8,7 @@ namespace gbg {
 
 RESOURCE_HANDLE(Model);
 
-class Model : public DResource {
+class Model : public DResource<ModelHandle> {
    public:
     DRESOURCE_CONSTR(Model)
 

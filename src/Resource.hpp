@@ -29,13 +29,14 @@ class ResourceHandle {
     bool operator==(const ResourceHandle& other) const {
         return (other._rid == _rid);
     }
-    bool operator==(uint32_t other) const { return (other == _rid); }
 
     explicit operator bool() const { return INDEX(_rid); }
 };
 
 // base class for any resource
+template <typename TH>
 class Resource {
+    static_assert(std::is_base_of_v<ResourceHandle, TH>, "TH must be based on ResourceHandle");
    public:
     // TODO: rid 0 vol dir que és null
     Resource() {}
@@ -49,6 +50,9 @@ class Resource {
 
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
+    TH getHandle() const {
+        return _rid;
+    }
 
    private:
     std::string _name;
@@ -59,14 +63,14 @@ class Resource {
 template <typename T, typename TH>
 class ResourceManager {
     static_assert(std::is_base_of_v<ResourceHandle, TH>,
-                  "The ResourceHandle type must be based of ResourceHandle");
-    static_assert(std::is_base_of_v<Resource, T>,
-                  "The Resource type must be based of Resource");
+                  "The TH type must be based of ResourceHandle");
+    static_assert(std::is_base_of_v<Resource<TH>, T>,
+                  "The T type must be based of Resource");
     static_assert(std::is_constructible_v<T, std::string, uint32_t>,
-                  "The Resource must have this constructor");
+                  "The T type must have this constructor");
     static_assert(
         std::is_default_constructible_v<T>,
-        "The Resource must be default constructible with a call to Resource()");
+        "The T type must be default constructible with a call to Resource()");
 
    public:
     ResourceManager(size_t initial_size = 20) {
@@ -79,7 +83,7 @@ class ResourceManager {
     ResourceManager(ResourceManager&& other) = default;
     ResourceManager& operator=(ResourceManager&& other) = default;
 
-    T& create(const std::string& name) {
+    TH create(const std::string& name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
             index = _free_indexes.front();
@@ -89,10 +93,10 @@ class ResourceManager {
         } else {
             _resources.push_back(T(name, BUILD_ID(0, index)));
         }
-        return _resources[index];
+        return _resources[index].getHandle(); 
     }
 
-    T& create(TH handle) {
+    TH create(TH handle) {
         if (handle.getIndex() < _resources.size())
             _resources.resize(handle.getIndex() + 1);
         else
@@ -100,11 +104,12 @@ class ResourceManager {
                                  .getRID()));  // enshure we are creating on an
                                                // empty spot
         _resources[handle.getIndex()] = T(handle.getRID());
+        return handle;
     }
 
     T& get(TH handle) {
         assert(handle.getIndex() != 0);
-        assert(handle == _resources[handle.getIndex()].getRID());
+        assert(handle == _resources[handle.getIndex()].getHandle());
         return _resources[handle.getIndex()];
     }
 
@@ -120,13 +125,15 @@ class ResourceManager {
     }
 
     std::vector<T>& getAll() { return _resources; }
+    
     void clear() {
         _resources.clear();
         while (!_free_indexes.empty()) _free_indexes.pop_front();
     }
+    
     void destroy(TH handle) {
         assert(handle.getIndex() != 0);
-        assert(handle == _resources[handle.getIndex()].getRID());
+        assert(handle == _resources[handle.getIndex()].getHandle());
         _resources[handle.getIndex()] = T(BUILD_ID(handle.getGen() + 1, 0));
         _free_indexes.push_front(handle.getIndex());
     }
@@ -145,11 +152,11 @@ class ResourceManager {
         iterator& operator++() {
             size_t index = _handl.getIndex() + 1;
             while (index < _manager._resources.size() &&
-                   not INDEX(_manager._resources[index].getRID())) {
+                   not _manager._resources[index].getHandle().getIndex()) {
                 index++;
             }
             if (index >= _manager._resources.size()) index = 0;
-            _handl = _manager._resources[index].getRID();
+            _handl = _manager._resources[index].getHandle();
             return *this;
         };
 
@@ -168,11 +175,11 @@ class ResourceManager {
 
     iterator begin() {
         if (_resources.size() > 1)
-            return iterator(*this, TH(_resources[1].getRID(), 1));
+            return iterator(*this, _resources[1].getHandle());
         return end();
     }
 
-    iterator end() { return iterator(*this, TH(0, 0)); }
+    iterator end() { return iterator(*this, TH(0)); }
 
    private:
     std::vector<T> _resources;

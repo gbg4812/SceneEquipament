@@ -20,7 +20,7 @@ using attr_vt_alt = std::variant_alternative_t<to_underlying(I), attr_vt>;
 
 RESOURCE_HANDLE(Mesh);
 
-class Mesh : public DResource {
+class Mesh : public DResource<MeshHandle> {
     std::map<uint, attr_vt> _attributes;
     std::vector<face_t> _faces;
     size_t _nvertices = 0;

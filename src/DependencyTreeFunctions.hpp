@@ -4,7 +4,7 @@
 
 namespace gbg {
 template <typename T, typename H>
-    requires std::derived_from<T, DResource>
+    requires std::derived_from<T, DResource<H>>
 inline DependencyTreeNodeHandle createRepresentative(
     DependencyTreeManager& manager, H res_h, ResourceManager<T, H>& res_manager,
     ResourceType type, DependencyMask initMask = 0) {
@@ -16,9 +16,10 @@ inline DependencyTreeNodeHandle createRepresentative(
     return dtn.getRID();
 }
 
+template <typename TH>
 inline void setDependent(DependencyTreeManager& manager,
-                         const DResource& dependent, DependencyMask mask_cons,
-                         const DResource& depended, DependencyMask mask_pre) {
+                         const DResource<TH>& dependent, DependencyMask mask_cons,
+                         const DResource<TH>& depended, DependencyMask mask_pre) {
     auto it = manager.get(depended.representative)
                   .dependents.insert({{
                                           .dependent = dependent.representative,
@@ -32,9 +33,11 @@ inline void setDependent(DependencyTreeManager& manager,
         manager.propagateChange(dependent.representative, mask_cons);
     }
 }
+
+template <typename TH>
 inline void deleteDependent(DependencyTreeManager& manager,
-                            const DResource& dependent,
-                            DependencyMask mask_cons, const DResource& depended,
+                            const DResource<TH>& dependent,
+                            DependencyMask mask_cons, const DResource<TH>& depended,
                             DependencyMask mask_pre) {
     manager.get(depended.representative)
         .dependents.erase({dependent.representative, mask_pre, mask_cons});
