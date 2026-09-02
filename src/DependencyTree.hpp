@@ -38,7 +38,7 @@ struct Dependency {
     }
 };
 
-class DependencyTreeNode : public Resource<DependencyTreeNodeHandle> {
+class DependencyTreeNode : public Resource {
     // TODO: rid 0 vol dir que és null
    public:
     RESOURCE_CONSTR(DependencyTreeNode);
@@ -58,17 +58,17 @@ class DependencyTreeManager
     DependencyTreeManager(size_t initial_size = 0)
         : ResourceManager(initial_size) {}
 
-    DependencyTreeNodeHandle create(ResourceHandle represented,
-                                    ResourceType type) {
+    DependencyTreeNode& create(ResourceHandle represented, ResourceType type) {
         if (not represented.getIndex()) {
             throw std::runtime_error("Represented handle can't be empty");
         }
-        auto& n = ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
-            create("Representant" + std::to_string(represented.getRID()));
+        auto& n =
+            ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
+                create("Representant" + std::to_string(represented.getRID()));
         n.type = type;
         n.represented = represented;
         n.flags = EMPTY_MASK;
-        return n.getHandle();
+        return n;
     };
 
     void propagateChange(DependencyTreeNodeHandle handle, DependencyMask mask) {

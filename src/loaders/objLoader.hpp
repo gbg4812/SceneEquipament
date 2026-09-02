@@ -147,8 +147,9 @@ inline void parseLine(const std::string& line, Mesh& mesh,
 /* Loads all the models in a .obj file and hangs them from the parent
  * @return a list of handles to all the scene nodes added
  */
-inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene, SceneTreeHandle parent,
-                      MaterialHandle default_mat) {
+inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene,
+                                            SceneTreeHandle parent,
+                                            MaterialHandle default_mat) {
     std::map<std::string,
              void (*)(const std::string&, Mesh&, _parser_context& context)>
         dispatch;
@@ -180,12 +181,12 @@ inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene, Scen
         if (type == "o") {
             std::string name;
             ss >> name;
-            mdh = md_mg.create(name).getHandle();
-            SceneTreeHandle child = st_mg.create(name).getHandle();
+            mdh = md_mg.create(name).getRID();
+            SceneTreeHandle child = st_mg.create(name).getRID();
             added.push_back(child);
             st_mg.get(child).setResource(mdh);
             st_mg.prependChild(parent, child);
-            msh = ms_mg.create("Mesh0").getHandle();
+            msh = ms_mg.create("Mesh0").getRID();
 
             md_mg.get(mdh).setMesh(msh);
             md_mg.get(mdh).setMaterial(default_mat);

@@ -4,9 +4,9 @@
 #include <variant>
 
 #include "Camera.hpp"
+#include "DResource.hpp"
 #include "Light.hpp"
 #include "Model.hpp"
-#include "DResource.hpp"
 #include "gbg_traits.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "macros.hpp"
@@ -29,11 +29,10 @@ using scene_obj_alt =
 
 RESOURCE_HANDLE(SceneTree);
 
-class SceneTreeNode : public DResource<SceneTreeHandle> {
+class SceneTreeNode : public DResource {
     // TODO: rid 0 vol dir que és null
    public:
-    SceneTreeNode() : DResource(){};
-    SceneTreeNode(std::string name, uint32_t rid) : DResource(name, rid) {}
+    DRESOURCE_CONSTR(SceneTreeNode)
 
     template <SceneObjectTypes I>
     scene_obj_alt<I> getResourceH() {
@@ -83,7 +82,7 @@ class SceneTreeManager
     glm::mat4 getGlobalTransform(SceneTreeHandle h) {
         SceneTreeNode& node = this->get(h);
         if (node.parentH)
-            return  node.getLocalTransform() * getGlobalTransform(node.parentH) ;
+            return node.getLocalTransform() * getGlobalTransform(node.parentH);
         else
             return node.getLocalTransform();
     }

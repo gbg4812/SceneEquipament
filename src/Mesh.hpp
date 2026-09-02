@@ -20,7 +20,7 @@ using attr_vt_alt = std::variant_alternative_t<to_underlying(I), attr_vt>;
 
 RESOURCE_HANDLE(Mesh);
 
-class Mesh : public DResource<MeshHandle> {
+class Mesh : public DResource {
     std::map<uint, attr_vt> _attributes;
     std::vector<face_t> _faces;
     size_t _nvertices = 0;
@@ -32,8 +32,7 @@ class Mesh : public DResource<MeshHandle> {
     };
 
    public:
-    Mesh() : DResource() {}
-    Mesh(std::string name, uint32_t rid) : DResource(name, rid) {}
+    DRESOURCE_CONSTR(Mesh)
 
     template <AttributeTypes I>
     attr_vt_alt<I>& getAttribute(uint location) {
@@ -61,7 +60,6 @@ class Mesh : public DResource<MeshHandle> {
 
     const std::vector<face_t>& getFaces() const { return _faces; }
 };
-
 
 RESOURCE_MANAGER(Mesh);
 

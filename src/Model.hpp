@@ -8,10 +8,9 @@ namespace gbg {
 
 RESOURCE_HANDLE(Model);
 
-class Model : public DResource<ModelHandle> {
+class Model : public DResource {
    public:
-    Model() : DResource(){};
-    Model(std::string name, uint32_t rid) : DResource(name, rid){};
+    DRESOURCE_CONSTR(Model)
 
     void setMesh(MeshHandle mesh) { _mesh = mesh; }
     void setMaterial(MaterialHandle material) { _material = material; }

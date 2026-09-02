@@ -8,12 +8,12 @@ template <typename T, typename H>
 inline DependencyTreeNodeHandle createRepresentative(
     DependencyTreeManager& manager, H res_h, ResourceManager<T, H>& res_manager,
     ResourceType type, DependencyMask initMask = 0) {
-    auto h = manager.create(res_h, type);
-    res_manager.get(res_h).representative = h;
+    DependencyTreeNode& dtn = manager.create(res_h, type);
+    res_manager.get(res_h).representative = dtn.getRID();
     if (initMask) {
-        manager.propagateChange(h, initMask);
+        manager.propagateChange(dtn.getRID(), initMask);
     }
-    return h;
+    return dtn.getRID();
 }
 
 inline void setDependent(DependencyTreeManager& manager,

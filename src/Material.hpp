@@ -10,10 +10,9 @@ namespace gbg {
 
 RESOURCE_HANDLE(Material);
 
-class Material : public DResource<MaterialHandle> {
+class Material : public DResource {
    public:
-    Material() : DResource() {}
-    Material(std::string name, uint32_t rid) : DResource(name, rid) {}
+    DRESOURCE_CONSTR(Material)
 
     void setShader(ShaderHandle sh) { _shaderh = sh; }
 

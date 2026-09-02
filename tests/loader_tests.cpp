@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include "Material.hpp"
 #include "Mesh.hpp"
+#include "SceneTree.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include "loaders/objLoader.hpp"
@@ -47,9 +49,9 @@ TEST(loader_tests, loader_load) {
     auto& ms_mg = sc.getMeshManager();
     auto& st_mg = sc.getSceneTreeManager();
 
-    auto parent = st_mg.create("Root");
+    SceneTreeHandle parent = st_mg.create("Root").getRID();
 
-    auto mth = mt_mg.create("Default Material");
+    MaterialHandle mth = mt_mg.create("Default Material").getRID();
 
     objLoader("./data/Cube.obj", &sc, parent, mth);
 
@@ -73,9 +75,9 @@ TEST(loader_tests, loader_stress) {
     auto& ms_mg = sc.getMeshManager();
     auto& st_mg = sc.getSceneTreeManager();
 
-    auto parent = st_mg.create("Root");
+    auto parent = st_mg.create("Root").getRID();
 
-    auto mth = mt_mg.create("Default Material");
+    MaterialHandle mth = mt_mg.create("Default Material").getRID();
 
     objLoader("./data/sponza/sponza.obj", &sc, parent, mth);
 }

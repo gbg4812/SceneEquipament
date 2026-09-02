@@ -2,9 +2,9 @@
 
 #include <variant>
 
+#include "DResource.hpp"
 #include "Mesh.hpp"
 #include "ParameterTypes.hpp"
-#include "DResource.hpp"
 #include "Texture.hpp"
 #include "gbg_traits.hpp"
 #include "macros.hpp"
@@ -13,25 +13,26 @@ namespace gbg {
 typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
 enum ParameterTypes {
-    INT_PARM = 0, FLOAT_PARM, VEC2_PARM, VEC3_PARM, TEXTURE_PARM
+    INT_PARM = 0,
+    FLOAT_PARM,
+    VEC2_PARM,
+    VEC3_PARM,
+    TEXTURE_PARM
 };
-inline std::array<std::string_view, to_underlying(ParameterTypes::TEXTURE_PARM) + 1> parmTypeToString =  {"int", "float", "vec2", "vec3", "texture"};
+inline std::array<std::string_view,
+                  to_underlying(ParameterTypes::TEXTURE_PARM) + 1>
+    parmTypeToString = {"int", "float", "vec2", "vec3", "texture"};
 
-enum PrimitiveInterpretation {
-    TRIANGLES,
-    POINTS,
-    LINES
-};
+enum PrimitiveInterpretation { TRIANGLES, POINTS, LINES };
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 RESOURCE_HANDLE(Shader);
 
-class Shader : public DResource<ShaderHandle> {
+class Shader : public DResource {
    public:
-    Shader() : DResource(){};
-    Shader(std::string name, uint32_t rid) : DResource(name, rid){};
+    DRESOURCE_CONSTR(Shader)
 
     // returns the position
     size_t addParameter(ParameterTypes I) {
@@ -66,17 +67,17 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void setFragShaderCode(std::vector<uint32_t> code) {
-        _frag_code = code;
+    void setFragShaderCode(std::vector<uint32_t> code) { _frag_code = code; }
+
+    void setVertShaderCode(std::vector<uint32_t> code) { _vert_code = code; }
+
+    const std::vector<uint32_t>& getFragShaderCode() const {
+        return _frag_code;
     }
 
-    void setVertShaderCode(std::vector<uint32_t> code) {
-        _vert_code = code;
+    const std::vector<uint32_t>& getVertShaderCode() const {
+        return _vert_code;
     }
-
-    const std::vector<uint32_t>& getFragShaderCode() const { return _frag_code; }
-
-    const std::vector<uint32_t>& getVertShaderCode() const { return _vert_code; }
 
     PrimitiveInterpretation topology = TRIANGLES;
     bool shadow = true;
@@ -86,9 +87,7 @@ class Shader : public DResource<ShaderHandle> {
     std::map<uint, AttributeTypes> _attributes;
     std::vector<uint32_t> _frag_code;
     std::vector<uint32_t> _vert_code;
-
 };
-
 
 RESOURCE_MANAGER(Shader);
 

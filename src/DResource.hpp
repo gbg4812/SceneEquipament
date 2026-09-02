@@ -1,20 +1,15 @@
 #pragma once
-#include "Resource.hpp"
 #include "DependencyTree.hpp"
+#include "Resource.hpp"
 #include "macros.hpp"
 
 namespace gbg {
-    template <typename TH>
-    class DResource : public Resource<TH> {
-        public:
-         DResource() : Resource<ResourceHandle>(){};
-         DResource(std ::string name, uint32_t rid)
-             : Resource<ResourceHandle>(name, rid){};
-         ;
+class DResource : public Resource {
+   public:
+    RESOURCE_CONSTR(DResource)
 
-        public:
-            DependencyTreeNodeHandle representative;
+   public:
+    DependencyTreeNodeHandle representative;
+};
 
-    };
-
-}
+}  // namespace gbg

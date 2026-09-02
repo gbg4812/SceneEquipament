@@ -8,10 +8,9 @@ namespace gbg {
 
 RESOURCE_HANDLE(Texture);
 
-class Texture : public DResource<TextureHandle> {
+class Texture : public DResource {
    public:
-    Texture() : DResource() {}
-    Texture(std::string name, uint32_t rid) : DResource(name, rid) {}
+    DRESOURCE_CONSTR(Texture)
 
    public:
     std::string path;
