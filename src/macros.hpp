@@ -26,3 +26,7 @@
 #define RESOURCE_MANAGER(ResourceTypeName)                              \
     typedef ResourceManager<ResourceTypeName, ResourceTypeName##Handle> \
         ResourceTypeName##Manager;
+
+#define RELATED_RESOURCE_MANAGER(ResourceTypeName, HandleType) \
+    typedef ResourceManager<ResourceTypeName, HandleType>      \
+        ResourceTypeName##Manager;

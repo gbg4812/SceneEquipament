@@ -1,8 +1,6 @@
 #pragma once
 
-#include <forward_list>
 #include <map>
-#include <set>
 #include <stdexcept>
 #include <string>
 
@@ -62,9 +60,8 @@ class DependencyTreeManager
         if (not represented.getIndex()) {
             throw std::runtime_error("Represented handle can't be empty");
         }
-        auto h =
-            ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
-                create("Representant" + std::to_string(represented.getRID()));
+        auto h = ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
+            create("Representant" + std::to_string(represented.getRID()));
         auto& n = get(h);
         n.type = type;
         n.represented = represented;

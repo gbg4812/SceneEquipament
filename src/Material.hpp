@@ -24,7 +24,7 @@ class Material : public DResource<MaterialHandle> {
 
     template <ParameterTypes I>
     void setParameterValue(size_t pos, parm_vt_alt<I> value) {
-        _parameters[pos] = value;
+        _parameters.at(pos) = value;
     }
 
     template <ParameterTypes I>

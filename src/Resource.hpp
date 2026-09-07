@@ -20,7 +20,7 @@ class ResourceHandle {
    public:
     ResourceHandle(uint32_t rid) : _rid(rid) {}
     ResourceHandle(uint32_t gen, uint32_t idx) : _rid(BUILD_ID(gen, idx)) {}
-    ResourceHandle() : _rid(0){};
+    ResourceHandle() : _rid(0) {};
     uint32_t getRID() const { return _rid; }
     uint32_t getIndex() const { return INDEX(_rid); }
     uint32_t getGen() const { return GEN(_rid); }
@@ -36,7 +36,9 @@ class ResourceHandle {
 // base class for any resource
 template <typename TH>
 class Resource {
-    static_assert(std::is_base_of_v<ResourceHandle, TH>, "TH must be based on ResourceHandle");
+    static_assert(std::is_base_of_v<ResourceHandle, TH>,
+                  "TH must be based on ResourceHandle");
+
    public:
     // TODO: rid 0 vol dir que és null
     Resource() {}
@@ -50,9 +52,7 @@ class Resource {
 
     const std::string& getName() const { return _name; }
     uint32_t getRID() const { return _rid; }
-    TH getHandle() const {
-        return _rid;
-    }
+    TH getHandle() const { return _rid; }
 
    private:
     std::string _name;
@@ -83,6 +83,14 @@ class ResourceManager {
     ResourceManager(ResourceManager&& other) = default;
     ResourceManager& operator=(ResourceManager&& other) = default;
 
+    uint32_t nextIndex() const {
+        if (not _free_indexes.empty()) {
+            return _free_indexes.front();
+        } else {
+            return _resources.size();
+        }
+    }
+
     TH create(const std::string& name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
@@ -93,11 +101,11 @@ class ResourceManager {
         } else {
             _resources.push_back(T(name, BUILD_ID(0, index)));
         }
-        return _resources[index].getHandle(); 
+        return _resources[index].getHandle();
     }
 
     TH create(TH handle) {
-        if (handle.getIndex() < _resources.size())
+        if (handle.getIndex() >= _resources.size())
             _resources.resize(handle.getIndex() + 1);
         else
             assert(not INDEX(_resources[handle.getIndex()]
@@ -125,12 +133,12 @@ class ResourceManager {
     }
 
     std::vector<T>& getAll() { return _resources; }
-    
+
     void clear() {
         _resources.clear();
         while (!_free_indexes.empty()) _free_indexes.pop_front();
     }
-    
+
     void destroy(TH handle) {
         assert(handle.getIndex() != 0);
         assert(handle == _resources[handle.getIndex()].getHandle());

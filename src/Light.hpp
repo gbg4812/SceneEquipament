@@ -10,9 +10,7 @@ class Light : public DResource<LightHandle> {
    public:
     DRESOURCE_CONSTR(Light)
 
-    float intensity = 0;
     glm::vec3 color = glm::vec3(1.0f);
-    glm::vec3 direction;
 };
 
 RESOURCE_MANAGER(Light);

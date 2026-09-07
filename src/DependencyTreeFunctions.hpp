@@ -16,10 +16,12 @@ inline DependencyTreeNodeHandle createRepresentative(
     return dtn.getRID();
 }
 
-template <typename TH>
+template <typename AH, typename BH>
 inline void setDependent(DependencyTreeManager& manager,
-                         const DResource<TH>& dependent, DependencyMask mask_cons,
-                         const DResource<TH>& depended, DependencyMask mask_pre) {
+                         const DResource<AH>& dependent,
+                         DependencyMask mask_cons,
+                         const DResource<BH>& depended,
+                         DependencyMask mask_pre) {
     auto it = manager.get(depended.representative)
                   .dependents.insert({{
                                           .dependent = dependent.representative,
@@ -37,7 +39,8 @@ inline void setDependent(DependencyTreeManager& manager,
 template <typename TH>
 inline void deleteDependent(DependencyTreeManager& manager,
                             const DResource<TH>& dependent,
-                            DependencyMask mask_cons, const DResource<TH>& depended,
+                            DependencyMask mask_cons,
+                            const DResource<TH>& depended,
                             DependencyMask mask_pre) {
     manager.get(depended.representative)
         .dependents.erase({dependent.representative, mask_pre, mask_cons});
