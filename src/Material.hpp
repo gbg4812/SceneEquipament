@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utility>
+#include <variant>
 
 #include "DResource.hpp"
 #include "Shader.hpp"
@@ -16,7 +16,7 @@ class Material : public DResource<MaterialHandle> {
 
     void setShader(ShaderHandle sh) { _shaderh = sh; }
 
-    void clearParameters() { _parameters.clear(); }
+    void clearParameters(int start = 0) { _parameters.resize(start); }
 
     void appendParameter(parm_vt init_value) {
         _parameters.push_back(init_value);
@@ -27,10 +27,6 @@ class Material : public DResource<MaterialHandle> {
         _parameters.at(pos) = value;
     }
 
-    template <ParameterTypes I>
-    parm_vt_alt<I> getParameterValue(size_t pos) {
-        return std::get<to_underlying(I)>(_parameters[pos]);
-    }
 
     const std::vector<parm_vt>& getValues() const { return _parameters; }
     ShaderHandle getShaderHandle() const { return _shaderh; }
