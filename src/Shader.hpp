@@ -12,18 +12,14 @@
 namespace gbg {
 typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
-enum ParameterTypes {
-    INT_PARM = 0,
-    FLOAT_PARM,
-    VEC2_PARM,
-    VEC3_PARM,
-    TEXTURE_PARM
-};
-inline std::array<std::string_view,
-                  to_underlying(ParameterTypes::TEXTURE_PARM) + 1>
+enum class ParameterTypes { INT, FLOAT, VEC2, VEC3, TEXTURE, _MAX };
+
+inline std::array<std::string_view, to_underlying(ParameterTypes::_MAX)>
     parmTypeToString = {"int", "float", "vec2", "vec3", "texture"};
 
-enum PrimitiveInterpretation { TRIANGLES, POINTS, LINES };
+enum class PrimitiveInterpretation { TRIANGLES, POINTS, LINES, _MAX };
+
+enum class ShaderTypes { VERTEX, FRAGMENT, _MAX };
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
@@ -67,26 +63,21 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void setFragShaderCode(std::vector<uint32_t> code) { _frag_code = code; }
-
-    void setVertShaderCode(std::vector<uint32_t> code) { _vert_code = code; }
-
-    const std::vector<uint32_t>& getFragShaderCode() const {
-        return _frag_code;
+    void setCode(const std::string& code, ShaderTypes shader_type) {
+        _codes[to_underlying(shader_type)] = code;
     }
 
-    const std::vector<uint32_t>& getVertShaderCode() const {
-        return _vert_code;
+    const std::string& getCode(ShaderTypes shader_type) const {
+        return _codes[to_underlying(shader_type)];
     }
 
-    PrimitiveInterpretation topology = TRIANGLES;
+    PrimitiveInterpretation topology = PrimitiveInterpretation::TRIANGLES;
     bool shadow = true;
 
    private:
     std::vector<ParameterTypes> _parameters;
     std::map<uint, AttributeTypes> _attributes;
-    std::vector<uint32_t> _frag_code;
-    std::vector<uint32_t> _vert_code;
+    std::array<std::string, to_underlying(ShaderTypes::_MAX)> _codes;
 };
 
 RESOURCE_MANAGER(Shader);

@@ -1,7 +1,6 @@
 #pragma once
 #include "DependencyTree.hpp"
 #include "Resource.hpp"
-#include "macros.hpp"
 
 namespace gbg {
 template <typename TH>

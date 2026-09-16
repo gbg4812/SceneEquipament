@@ -34,9 +34,9 @@ TEST(scene_tests, create_resources) {
 
     ASSERT_EQ(shader.getName(), "Shader1");
 
-    shader.addParameter(ParameterTypes::FLOAT_PARM);
-    shader.addParameter(ParameterTypes::VEC3_PARM);
-    shader.addParameter(ParameterTypes::VEC2_PARM);
+    shader.addParameter(ParameterTypes::FLOAT);
+    shader.addParameter(ParameterTypes::VEC3);
+    shader.addParameter(ParameterTypes::VEC2);
 
     auto& mt_mg = sc.getMaterialManager();
 
@@ -54,7 +54,7 @@ TEST(scene_tests, create_resources) {
         it++;
     }
 }
-    
+
 TEST(scene_tests, scene_tree) {
     Scene sc;
     auto& md_mg = sc.getModelManager();
@@ -83,17 +83,15 @@ TEST(scene_tests, scene_tree) {
         st_mg.prependChild(st_mg.get(root_h).childH, ch1_h);
     }
 
-    ASSERT_EQ(m1_h,
-              st_mg.get(root_h).getResourceH<SceneObjectTypes::MODEL>());
+    ASSERT_EQ(m1_h, st_mg.get(root_h).getResourceH<SceneObjectTypes::MODEL>());
     int i = 9;
     for (SceneTreeHandle nh = st_mg.get(root_h).childH; nh;
          nh = st_mg.get(nh).nextH) {
         SceneTreeNode& n = st_mg.get(nh);
-        ASSERT_EQ(m2_h,
-                  n.getResourceH<SceneObjectTypes::MODEL>());
+        ASSERT_EQ(m2_h, n.getResourceH<SceneObjectTypes::MODEL>());
         ASSERT_EQ("Child" + std::to_string(i), n.getName());
         i--;
     }
-    
+
     ASSERT_EQ(i, -1);
 }

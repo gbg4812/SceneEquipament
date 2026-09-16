@@ -12,7 +12,7 @@ class Light : public DResource<LightHandle> {
 
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 1.0f;
-    float fov = 45.0f; // degrees
+    float fov = 45.0f;  // degrees
 };
 
 RESOURCE_MANAGER(Light);

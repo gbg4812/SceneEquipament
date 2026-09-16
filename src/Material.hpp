@@ -27,7 +27,6 @@ class Material : public DResource<MaterialHandle> {
         _parameters.at(pos) = value;
     }
 
-
     const std::vector<parm_vt>& getValues() const { return _parameters; }
     ShaderHandle getShaderHandle() const { return _shaderh; }
 
