@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <variant>
 
 #include "DResource.hpp"
@@ -63,11 +64,11 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void setCode(const std::string& code, ShaderTypes shader_type) {
+    void setCode(const std::vector<uint32_t>& code, ShaderTypes shader_type) {
         _codes[to_underlying(shader_type)] = code;
     }
 
-    const std::string& getCode(ShaderTypes shader_type) const {
+    const std::vector<uint32_t>& getCode(ShaderTypes shader_type) const {
         return _codes[to_underlying(shader_type)];
     }
 
@@ -77,7 +78,7 @@ class Shader : public DResource<ShaderHandle> {
    private:
     std::vector<ParameterTypes> _parameters;
     std::map<uint, AttributeTypes> _attributes;
-    std::array<std::string, to_underlying(ShaderTypes::_MAX)> _codes;
+    std::array<std::vector<uint32_t>, to_underlying(ShaderTypes::_MAX)> _codes;
 };
 
 RESOURCE_MANAGER(Shader);
