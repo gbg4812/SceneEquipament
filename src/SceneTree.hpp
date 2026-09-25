@@ -69,7 +69,7 @@ class SceneTreeNode : public DResource<SceneTreeHandle> {
 class SceneTreeManager
     : public ResourceManager<SceneTreeNode, SceneTreeHandle> {
    public:
-    SceneTreeManager(size_t initial_size = 0) : ResourceManager(initial_size) {}
+    SceneTreeManager(size_t chunk_size = 64) : ResourceManager(chunk_size) {}
 
     void prependChild(SceneTreeHandle parent, SceneTreeHandle child) {
         SceneTreeNode& parentn = this->get(parent);

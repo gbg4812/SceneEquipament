@@ -55,15 +55,14 @@ TEST(loader_tests, loader_load) {
 
     objLoader("./data/Cube.obj", &sc, parent, mth);
 
-    ASSERT_EQ(md_mg.getAll()[1].getName(), "Cube");
+    ASSERT_EQ(md_mg.begin()->getName(), "Cube");
 
-    ASSERT_EQ(md_mg.getAll()[1].getMesh().getRID(), ms_mg.getAll()[1].getRID());
-    ASSERT_EQ(md_mg.getAll()[1].getMaterial(), mth);
+    ASSERT_EQ(md_mg.begin()->getMesh(), ms_mg.begin()->getHandle());
+    ASSERT_EQ(md_mg.begin()->getMaterial(), mth);
 
-    ASSERT_EQ(ms_mg.getAll()[1]
-                  .getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0)
-                  .size(),
-              24);
+    ASSERT_EQ(
+        ms_mg.begin()->getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0).size(),
+        24);
 }
 
 TEST(loader_tests, loader_stress) {
@@ -75,9 +74,10 @@ TEST(loader_tests, loader_stress) {
     auto& ms_mg = sc.getMeshManager();
     auto& st_mg = sc.getSceneTreeManager();
 
-    auto parent = st_mg.create("Root");
+    auto& parent = st_mg.create("Root");
 
-    MaterialHandle mth = mt_mg.create("Default Material");
+    auto& mt = mt_mg.create("Default Material");
 
-    objLoader("./data/sponza/sponza.obj", &sc, parent, mth);
+    objLoader("./data/sponza/sponza.obj", &sc, parent.getHandle(),
+              mt.getHandle());
 }

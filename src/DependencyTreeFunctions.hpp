@@ -3,16 +3,19 @@
 #include "DependencyTree.hpp"
 
 namespace gbg {
-template <typename T, typename H>
-    requires std::derived_from<T, DResource<H>>
+
+template <typename T>
 inline DependencyTreeNodeHandle createRepresentative(
-    DependencyTreeManager& manager, H res_h, ResourceManager<T, H>& res_manager,
-    ResourceType type, DependencyMask initMask = 0) {
-    DependencyTreeNode& dtn = manager.create(res_h, type);
-    res_manager.get(res_h).representative = dtn.getRID();
+    DependencyTreeManager& manager, DResource<T>& res, ResourceType type,
+    DependencyMask initMask = 0) {
+    // create representative
+    DependencyTreeNode& dtn = manager.create(res.getHandle(), type);
+    res.representative = dtn.getRID();
+
     if (initMask) {
         manager.propagateChange(dtn.getRID(), initMask);
     }
+
     return dtn.getRID();
 }
 

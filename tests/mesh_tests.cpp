@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "Mesh.hpp"
 
 TEST(model_tests, attrib_add_get) {

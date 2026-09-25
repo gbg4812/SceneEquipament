@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(UNIX)
-  set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O0 -Wall -gdwarf-4" )
+    set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O0 -Wall -gdwarf-4" )
 elseif( WIN32 )
-  ##
+    ##
 endif()
 
 
@@ -51,25 +51,25 @@ target_link_libraries(${PROJECT_NAME} INTERFACE glm::glm)
 target_link_libraries(${PROJECT_NAME} INTERFACE TracyClient)
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-  FetchContent_Declare(
+    FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG 52eb8108c5bdec04579160ae17225d66034bd723
 )
 
-  # For Windows: Prevent overriding the parent project's compiler/linker settings
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-  FetchContent_MakeAvailable(googletest)
+    FetchContent_MakeAvailable(googletest)
 
-  enable_testing()
+    enable_testing()
 
-  add_executable(
+    add_executable(
     resource_tests
     tests/resource_tests.cpp
 )
 
-  target_link_libraries(
+    target_link_libraries(
     resource_tests
     PRIVATE
     ${PROJECT_NAME}
@@ -78,12 +78,12 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
-  add_executable(
+    add_executable(
     mesh_tests
     tests/mesh_tests.cpp
 )
 
-  target_link_libraries(
+    target_link_libraries(
     mesh_tests
     PRIVATE
     ${PROJECT_NAME}
@@ -92,12 +92,12 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
-  add_executable(
+    add_executable(
     material_tests
     tests/material_tests.cpp
 )
 
-  target_link_libraries(
+    target_link_libraries(
     material_tests
     PRIVATE
     ${PROJECT_NAME}
@@ -106,12 +106,12 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
-  add_executable(
+    add_executable(
     scene_tests
     tests/scene_tests.cpp
 )
 
-  target_link_libraries(
+    target_link_libraries(
     scene_tests
     PRIVATE
     ${PROJECT_NAME}
@@ -120,12 +120,12 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
-  add_executable(
+    add_executable(
     loader_tests
     tests/loader_tests.cpp
 )
 
-  target_link_libraries(
+    target_link_libraries(
     loader_tests
     PRIVATE
     ${PROJECT_NAME}
@@ -134,12 +134,12 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     TracyClient
 )
 
-add_executable(
+    add_executable(
   dependency_tests
   tests/dependency_tests.cpp
 )
 
-target_link_libraries(
+    target_link_libraries(
   dependency_tests
   PRIVATE
   ${PROJECT_NAME}
@@ -148,14 +148,14 @@ target_link_libraries(
   TracyClient
 )
 
-  include(GoogleTest)
+    include(GoogleTest)
 
-  gtest_discover_tests(resource_tests)
-  gtest_discover_tests(mesh_tests)
-  gtest_discover_tests(material_tests)
-  gtest_discover_tests(scene_tests)
-  gtest_discover_tests(loader_tests)
-  gtest_discover_tests(dependency_tests)
+    gtest_discover_tests(resource_tests)
+    gtest_discover_tests(mesh_tests)
+    gtest_discover_tests(material_tests)
+    gtest_discover_tests(scene_tests)
+    gtest_discover_tests(loader_tests)
+    gtest_discover_tests(dependency_tests)
 
-  file(CREATE_LINK ${CMAKE_SOURCE_DIR}/tests/data ${CMAKE_BINARY_DIR}/data SYMBOLIC)
+    file(CREATE_LINK ${CMAKE_SOURCE_DIR}/tests/data ${CMAKE_BINARY_DIR}/data SYMBOLIC)
 endif()

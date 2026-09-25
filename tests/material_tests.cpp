@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include "Material.hpp"
 #include "Shader.hpp"
 
 using namespace gbg;

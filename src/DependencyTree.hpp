@@ -53,16 +53,16 @@ class DependencyTreeNode : public Resource<DependencyTreeNodeHandle> {
 class DependencyTreeManager
     : public ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle> {
    public:
-    DependencyTreeManager(size_t initial_size = 0)
-        : ResourceManager(initial_size) {}
+    DependencyTreeManager(size_t chunk_size = 64)
+        : ResourceManager(chunk_size) {}
 
     DependencyTreeNode& create(ResourceHandle represented, ResourceType type) {
         if (not represented.getIndex()) {
             throw std::runtime_error("Represented handle can't be empty");
         }
-        auto h = ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
-            create("Representant" + std::to_string(represented.getRID()));
-        auto& n = get(h);
+        auto& n =
+            ResourceManager<DependencyTreeNode, DependencyTreeNodeHandle>::
+                create("Representant" + std::to_string(represented.getRID()));
         n.type = type;
         n.represented = represented;
         n.flags = EMPTY_MASK;

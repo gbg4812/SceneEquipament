@@ -1,14 +1,10 @@
 #pragma once
 #include <cassert>
 #define STB_IMAGE_IMPLEMENTATION
-#include "../Scene.hpp"
 #include "../Texture.hpp"
 #include "external/stb_image.h"
 
-inline bool loadTexture(std::string_view path, gbg::Scene* scene,
-                        gbg::TextureHandle textureH) {
-    auto& tex_mn = scene->getTextureManager();
-    gbg::Texture& texture = tex_mn.get(textureH);
+inline bool loadTexture(std::string_view path, gbg::Texture& texture) {
     texture.mip_levels = 1;
     texture.path = path;
     if (texture.data.size() > 0) {

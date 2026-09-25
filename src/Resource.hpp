@@ -5,7 +5,8 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <vector>
+
+#include "containers/Hive.hpp"
 
 namespace gbg {
 
@@ -73,8 +74,8 @@ class ResourceManager {
         "The T type must be default constructible with a call to Resource()");
 
    public:
-    ResourceManager(size_t initial_size = 20) {
-        _resources.reserve(initial_size + 1);
+    ResourceManager(size_t chunk_size = 64) : _resources(chunk_size) {
+        assert(chunk_size > 0);
         _resources.push_back(T());
     }
 
@@ -91,7 +92,7 @@ class ResourceManager {
         }
     }
 
-    TH create(const std::string& name) {
+    T& create(const std::string& name) {
         size_t index = _resources.size();
         if (not _free_indexes.empty()) {
             index = _free_indexes.front();
@@ -101,10 +102,10 @@ class ResourceManager {
         } else {
             _resources.push_back(T(name, BUILD_ID(0, index)));
         }
-        return _resources[index].getHandle();
+        return _resources[index];
     }
 
-    TH create(TH handle) {
+    T& create(TH handle) {
         if (handle.getIndex() >= _resources.size())
             _resources.resize(handle.getIndex() + 1);
         else
@@ -112,7 +113,7 @@ class ResourceManager {
                                  .getRID()));  // enshure we are creating on an
                                                // empty spot
         _resources[handle.getIndex()] = T(handle.getRID());
-        return handle;
+        return _resources[handle.getIndex()];
     }
 
     T& get(TH handle) {
@@ -131,8 +132,6 @@ class ResourceManager {
         throw std::runtime_error("Resource by name: " + name +
                                  " does not exist!");
     }
-
-    std::vector<T>& getAll() { return _resources; }
 
     void clear() {
         _resources.clear();
@@ -172,9 +171,9 @@ class ResourceManager {
             return other._handl == this->_handl;
         }
 
-        TH operator*() { return _handl; }
+        T& operator*() { return _manager.get(_handl); }
 
-        TH operator->() { return *(*this); }
+        T* operator->() { return &_manager.get(_handl); }
 
        private:
         TH _handl;
@@ -190,7 +189,7 @@ class ResourceManager {
     iterator end() { return iterator(*this, TH(0)); }
 
    private:
-    std::vector<T> _resources;
+    Hive<T> _resources;
     std::list<size_t> _free_indexes;
 };
 

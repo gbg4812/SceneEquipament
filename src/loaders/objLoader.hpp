@@ -18,6 +18,7 @@
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
+#include "Mesh.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 
@@ -166,8 +167,7 @@ inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene,
     auto& ms_mg = scene->getMeshManager();
     auto& st_mg = scene->getSceneTreeManager();
 
-    ModelHandle mdh;
-    MeshHandle msh;
+    MeshHandle ms_h;
 
     std::list<SceneTreeHandle> added;
 
@@ -181,27 +181,27 @@ inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene,
         if (type == "o") {
             std::string name;
             ss >> name;
-            mdh = md_mg.create(name).getRID();
-            SceneTreeHandle child = st_mg.create(name).getRID();
-            added.push_back(child);
-            st_mg.get(child).setResource(mdh);
-            st_mg.prependChild(parent, child);
-            msh = ms_mg.create("Mesh0").getRID();
+            auto& md = md_mg.create(name);
+            auto& child = st_mg.create(name);
+            added.push_back(child.getHandle());
+            child.setResource(md.getHandle());
+            st_mg.prependChild(parent, child.getHandle());
+            auto& ms = ms_mg.create("Mesh0");
+            ms_h = ms.getHandle();
 
-            md_mg.get(mdh).setMesh(msh);
-            md_mg.get(mdh).setMaterial(default_mat);
-            Mesh& msh_i = ms_mg.get(msh);
-            msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
-            msh_i.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
-            msh_i.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
+            md.setMesh(ms.getHandle());
+            md.setMaterial(default_mat);
+            ms.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
+            ms.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
+            ms.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
 
             context.vertices.clear();
 
-        } else if (!mdh.empty()) {
-            Mesh& msh_i = ms_mg.get(msh);
+        } else if (ms_h) {
+            Mesh& ms = ms_mg.get(ms_h);
             auto it = dispatch.find(type);
             if (it != dispatch.end()) {
-                (*it).second(line, msh_i, context);
+                (*it).second(line, ms, context);
             }
         }
     }
