@@ -17,10 +17,6 @@
         ResourceTypeName##Handle(uint32_t rid) : ResourceHandle(rid){}; \
         ResourceTypeName##Handle(uint32_t gen, uint32_t idx)            \
             : ResourceHandle(gen, idx){};                               \
-        ResourceTypeName##Handle(const ResourceHandle& handle)          \
-            : ResourceHandle(handle){                                   \
-                                                                        \
-              };                                                        \
     }
 
 #define RESOURCE_MANAGER(ResourceTypeName)                              \

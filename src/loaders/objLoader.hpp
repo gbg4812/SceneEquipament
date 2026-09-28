@@ -15,10 +15,10 @@
 #include <string>
 #include <unordered_map>
 
+#include "../Mesh.hpp"
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
-#include "Mesh.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 
