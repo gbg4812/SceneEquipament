@@ -126,8 +126,8 @@ class ResourceManager {
      * @warning Not eficient, makes a linear search!
      */
     T& getByName(std::string name) {
-        for (TH rh : *this) {
-            if (get(rh).getName() == name) return get(rh);
+        for (auto& r : *this) {
+            if (r.getName() == name) return r;
         }
         throw std::runtime_error("Resource by name: " + name +
                                  " does not exist!");

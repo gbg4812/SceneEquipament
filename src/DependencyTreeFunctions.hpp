@@ -10,7 +10,7 @@ inline DependencyTreeNodeHandle createRepresentative(
     DependencyMask initMask = 0) {
     // create representative
     DependencyTreeNode& dtn = manager.create(res.getHandle(), type);
-    res.representative = dtn.getRID();
+    res.representative = dtn.getHandle();
 
     if (initMask) {
         manager.propagateChange(dtn.getRID(), initMask);
@@ -19,33 +19,32 @@ inline DependencyTreeNodeHandle createRepresentative(
     return dtn.getRID();
 }
 
-template <typename AH, typename BH>
 inline void setDependent(DependencyTreeManager& manager,
-                         const DResource<AH>& dependent,
+                         DependencyTreeNodeHandle dependent_h,
                          DependencyMask mask_cons,
-                         const DResource<BH>& depended,
+                         DependencyTreeNodeHandle depended_h,
                          DependencyMask mask_pre) {
-    auto it = manager.get(depended.representative)
+    auto it = manager.get(depended_h)
                   .dependents.insert({{
-                                          .dependent = dependent.representative,
+                                          .dependent = dependent_h,
                                           .mask_pre = mask_pre,
                                           .mask_cons = mask_cons,
                                       },
                                       false});
-    if (manager.get(depended.representative).flags & mask_pre) {
+    if (manager.get(depended_h).flags & mask_pre) {
         it.first->second = true;
-        manager.get(dependent.representative).modifiedParents += 1;
-        manager.propagateChange(dependent.representative, mask_cons);
+        manager.get(dependent_h).modifiedParents += 1;
+        manager.propagateChange(dependent_h, mask_cons);
     }
 }
 
 template <typename TH>
 inline void deleteDependent(DependencyTreeManager& manager,
-                            const DResource<TH>& dependent,
+                            DependencyTreeNodeHandle dependent_h,
                             DependencyMask mask_cons,
-                            const DResource<TH>& depended,
+                            DependencyTreeNodeHandle depended_h,
                             DependencyMask mask_pre) {
-    manager.get(depended.representative)
-        .dependents.erase({dependent.representative, mask_pre, mask_cons});
+    manager.get(depended_h)
+        .dependents.erase({dependent_h, mask_pre, mask_cons});
 }
 }  // namespace gbg

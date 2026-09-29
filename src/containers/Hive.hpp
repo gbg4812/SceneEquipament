@@ -50,13 +50,19 @@ class Hive {
     }
 
     void reserve(size_t size) {
-        size_t diff = size - (_chunk_size * _blocks.size());
+        int diff = size - (_chunk_size * _blocks.size());
+        if(diff <=0) return;
         size_t blocks = diff / _chunk_size;
         blocks += (diff % _chunk_size > 0);
         _blocks.reserve(blocks);
         for (size_t i = 0; i < blocks; i++) {
             _blocks.push_back(std::make_unique<T[]>(_chunk_size));
         }
+    }
+
+    void resize(size_t size) {
+        reserve(size);
+        _size = size;
     }
 
     T& operator[](size_t idx) { return at(idx); }

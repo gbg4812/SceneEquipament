@@ -22,9 +22,9 @@ TEST(dependency_tests, create_propagate) {
     gbg::createRepresentative(manager, e3, SCENE_TREE_NODE);
     gbg::createRepresentative(manager, e4, SCENE_TREE_NODE);
 
-    gbg::setDependent(manager, e1, 1, e2, 1);
-    gbg::setDependent(manager, e2, 1, e3, 2);
-    gbg::setDependent(manager, e3, 3, e4, 1);
+    gbg::setDependent(manager, e1.representative, 1, e2.representative, 1);
+    gbg::setDependent(manager, e2.representative, 1, e3.representative, 2);
+    gbg::setDependent(manager, e3.representative, 3, e4.representative, 1);
 
     manager.propagateChange(e4.representative, 1);
 
