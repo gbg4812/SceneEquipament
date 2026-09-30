@@ -45,6 +45,26 @@ class Scene {
     SceneTreeManager st_mg;
 
     SceneDefaults defaults;
+    
+    const Shader& getDefaultShader() {
+        return sh_mg.get(defaults.shader);
+    };
+    const Material& getDefaultMaterial() {
+        return mat_mg.get(defaults.material);
+    };
+    const Texture& getDefaultTexture() {
+        return tx_mg.get(defaults.texture);
+    };
+    const Mesh& getDefaultMesh() {
+        return ms_mg.get(defaults.mesh);
+    };
+    const Camera& getDefaultCamera() {
+        return cm_mg.get(defaults.camera);
+    };
+    const Light& getDefaultLight() {
+        return lh_mg.get(defaults.light);
+    };
+    
 };
 
 }  // namespace gbg

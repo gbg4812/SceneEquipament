@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "DResource.hpp"
+#include "extras/File.hpp"
 #include "Mesh.hpp"
 #include "ParameterTypes.hpp"
 #include "Texture.hpp"
@@ -26,6 +27,11 @@ template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
 
 RESOURCE_HANDLE(Shader);
+
+struct ShaderCode {
+    std::vector<uint32_t> code;
+    FileHandle source_file;
+};
 
 class Shader : public DResource<ShaderHandle> {
    public:
@@ -64,12 +70,16 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void setCode(const std::vector<uint32_t>& code, ShaderTypes shader_type) {
-        _codes[to_underlying(shader_type)] = code;
+    void setCode(const std::vector<uint32_t>& code, FileHandle file, ShaderTypes shader_type) {
+        _codes[to_underlying(shader_type)] = {code, file};
     }
 
     const std::vector<uint32_t>& getCode(ShaderTypes shader_type) const {
-        return _codes[to_underlying(shader_type)];
+        return _codes[to_underlying(shader_type)].code;
+    }
+
+    FileHandle getCodeFile(ShaderTypes shader_type) const {
+        return _codes[to_underlying(shader_type)].source_file;
     }
 
     PrimitiveInterpretation topology = PrimitiveInterpretation::TRIANGLES;
@@ -78,7 +88,7 @@ class Shader : public DResource<ShaderHandle> {
    private:
     std::vector<ParameterTypes> _parameters;
     std::map<uint, AttributeTypes> _attributes;
-    std::array<std::vector<uint32_t>, to_underlying(ShaderTypes::_MAX)> _codes;
+    std::array<ShaderCode, to_underlying(ShaderTypes::_MAX)> _codes;
 };
 
 RESOURCE_MANAGER(Shader);
