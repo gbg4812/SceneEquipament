@@ -51,7 +51,7 @@ class Hive {
 
     void reserve(size_t size) {
         int diff = size - (_chunk_size * _blocks.size());
-        if(diff <=0) return;
+        if (diff <= 0) return;
         size_t blocks = diff / _chunk_size;
         blocks += (diff % _chunk_size > 0);
         _blocks.reserve(blocks);

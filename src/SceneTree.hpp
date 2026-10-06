@@ -7,6 +7,7 @@
 #include "DResource.hpp"
 #include "Light.hpp"
 #include "Model.hpp"
+#include "Texture.hpp"
 #include "gbg_traits.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "macros.hpp"
@@ -35,8 +36,10 @@ class SceneTreeNode : public DResource<SceneTreeHandle> {
     DRESOURCE_CONSTR(SceneTreeNode)
 
     template <SceneObjectTypes I>
-    scene_obj_alt<I> getResourceH() {
-        return std::get<to_underlying(I)>(_resource);
+    std::optional<scene_obj_alt<I>> getResourceH() {
+        if(std::holds_alternative<scene_obj_alt<I>>(_resource))
+            return std::get<to_underlying(I)>(_resource);
+        return std::nullopt;
     }
 
     scene_obj_vt getResourceH() { return _resource; }

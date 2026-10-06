@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera.hpp"
 #include "Light.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
@@ -34,6 +35,11 @@ class Scene {
 
     SceneTreeHandle root;
     SceneTreeHandle active_camera;
+
+    Camera& getActiveCamera() {
+        auto& cn = st_mg.get(active_camera);
+        return cm_mg.get(*cn.getResourceH<SceneObjectTypes::CAMERA>());
+    }
 
     MaterialManager mat_mg;
     ShaderManager sh_mg;
