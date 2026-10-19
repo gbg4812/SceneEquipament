@@ -4,10 +4,10 @@
 #include <variant>
 
 #include "DResource.hpp"
-#include "extras/File.hpp"
 #include "Mesh.hpp"
 #include "ParameterTypes.hpp"
 #include "Texture.hpp"
+#include "extras/File.hpp"
 #include "gbg_traits.hpp"
 #include "macros.hpp"
 
@@ -21,7 +21,7 @@ inline std::array<std::string_view, to_underlying(ParameterTypes::_MAX)>
 
 enum class PrimitiveInterpretation { TRIANGLES, POINTS, LINES, _MAX };
 
-enum class ShaderTypes { VERTEX, FRAGMENT, _MAX };
+enum class ShaderTypes { COMBINED, VERTEX, FRAGMENT, _MAX };
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
@@ -33,13 +33,18 @@ struct ShaderCode {
     FileHandle source_file;
 };
 
+struct ShaderParameter {
+    parm_vt default_value;
+    std::string name;
+};
+
 class Shader : public DResource<ShaderHandle> {
    public:
     DRESOURCE_CONSTR(Shader)
 
     // returns the position
-    size_t addParameter(ParameterTypes I) {
-        _parameters.push_back(I);
+    size_t addParameter(parm_vt default_value, std::string name = "") {
+        _parameters.push_back({default_value, name});
         return _parameters.size() - 1;
     };
 
@@ -48,11 +53,8 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes.size() - 1;
     };
 
-    void removeParameter(size_t pos) {
-        auto it = _parameters.begin();
-        for (size_t i = 0; i < pos; ++i, ++it) {
-            _parameters.erase(it, it);
-        }
+    void removeParameter(size_t idx) {
+        _parameters.erase(_parameters.begin() + idx);
     }
 
     void clear() {
@@ -62,7 +64,7 @@ class Shader : public DResource<ShaderHandle> {
 
     void removeAttribute(uint loc) { _attributes.erase(loc); }
 
-    const std::vector<ParameterTypes>& getParameters() const {
+    const std::vector<ShaderParameter>& getParameters() const {
         return _parameters;
     }
 
@@ -70,8 +72,13 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void setCode(const std::vector<uint32_t>& code, FileHandle file, ShaderTypes shader_type) {
-        _codes[to_underlying(shader_type)] = {code, file};
+    void addCodeFile(FileHandle file, ShaderTypes shader_type) {
+        _codes[to_underlying(shader_type)] = {{}, file};
+    }
+
+    void setByteCode(const std::vector<uint32_t>& code,
+                     ShaderTypes shader_type) {
+        _codes[to_underlying(shader_type)].code = code;
     }
 
     const std::vector<uint32_t>& getCode(ShaderTypes shader_type) const {
@@ -86,7 +93,7 @@ class Shader : public DResource<ShaderHandle> {
     bool shadow = true;
 
    private:
-    std::vector<ParameterTypes> _parameters;
+    std::vector<ShaderParameter> _parameters;
     std::map<uint, AttributeTypes> _attributes;
     std::array<ShaderCode, to_underlying(ShaderTypes::_MAX)> _codes;
 };

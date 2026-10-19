@@ -1,7 +1,5 @@
 #pragma once
 
-#include <variant>
-
 #include "DResource.hpp"
 #include "Shader.hpp"
 #include "macros.hpp"
@@ -16,14 +14,25 @@ class Material : public DResource<MaterialHandle> {
 
     void setShader(ShaderHandle sh) { _shaderh = sh; }
 
-    void clearParameters(int start = 0) { _parameters.resize(start); }
+    void removeParameter(size_t idx) {
+        _parameters.erase(_parameters.begin() + idx);
+    }
 
-    void appendParameter(parm_vt init_value) {
+    void clearParameters(size_t idx = 0) {
+        _parameters.erase(_parameters.begin() + idx, _parameters.end());
+    }
+
+    size_t appendParameter(parm_vt init_value) {
         _parameters.push_back(init_value);
+        return _parameters.size() - 1;
     }
 
     template <ParameterTypes I>
     void setParameterValue(size_t pos, parm_vt_alt<I> value) {
+        _parameters.at(pos) = value;
+    }
+
+    void setParameter(size_t pos, parm_vt value) {
         _parameters.at(pos) = value;
     }
 

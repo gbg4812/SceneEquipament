@@ -29,22 +29,21 @@ TEST(scene_tests, create_resources) {
 
     ASSERT_EQ(shader.getName(), "Shader1");
 
-    shader.addParameter(ParameterTypes::FLOAT);
-    shader.addParameter(ParameterTypes::VEC3);
-    shader.addParameter(ParameterTypes::VEC2);
+    shader.addParameter(0.0f, "intensity");
+    shader.addParameter(vec3_t(0, 1, 0), "direction");
 
     auto& mt_mg = sc.getMaterialManager();
 
     auto& mt = mt_mg.create("Material");
     mt.setShader(shader.getHandle());
 
-    setParametersFromShader(sc, mt);
+    setParametersFromShader(shader, mt);
 
     auto& vals = mt.getValues();
 
     auto it = vals.begin();
-    for (ParameterTypes parmt : shader.getParameters()) {
-        ASSERT_EQ(to_underlying(parmt), it->index());
+    for (const auto& parm : shader.getParameters()) {
+        ASSERT_EQ(parm.default_value.index(), it->index());
         it++;
     }
 }

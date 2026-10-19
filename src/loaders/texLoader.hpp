@@ -4,6 +4,9 @@
 #include "../Texture.hpp"
 #include "external/stb_image.h"
 
+/**
+ * @return if successfuly loaded `true` else `false`
+ */
 inline bool loadTexture(std::string_view path, gbg::Texture& texture) {
     texture.mip_levels = 1;
     texture.path = path;
@@ -16,5 +19,5 @@ inline bool loadTexture(std::string_view path, gbg::Texture& texture) {
         stbi_load(path.data(), &texture.width, &texture.height, &channels, 4);
     texture.data = std::span(
         data, texture.width * texture.height * 4 * sizeof(unsigned char));
-    return data == nullptr;
+    return data != nullptr;
 }
