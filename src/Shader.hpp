@@ -21,7 +21,20 @@ inline std::array<std::string_view, to_underlying(ParameterTypes::_MAX)>
 
 enum class PrimitiveInterpretation { TRIANGLES, POINTS, LINES, _MAX };
 
-enum class ShaderTypes { COMBINED, VERTEX, FRAGMENT, _MAX };
+enum class ShaderTypeFlags {
+    NONE = 0,
+    SHADER_TYPE_VERTEX = 1 << 0,
+    SHADER_TYPE_FRAGMENT = 1 << 1,
+    SHADER_TYPE_MASK_COMBINED = SHADER_TYPE_VERTEX & SHADER_TYPE_FRAGMENT,
+    _MAX
+};
+
+inline ShaderTypeFlags operator&(ShaderTypeFlags flags1, ShaderTypeFlags flags2) {
+    return (ShaderTypeFlags)(to_underlying(flags1) & to_underlying(flags2));
+}
+inline ShaderTypeFlags operator|(ShaderTypeFlags flags1, ShaderTypeFlags flags2) {
+    return (ShaderTypeFlags)(to_underlying(flags1) | to_underlying(flags2));
+}
 
 template <ParameterTypes I>
 using parm_vt_alt = std::variant_alternative_t<to_underlying(I), parm_vt>;
@@ -31,6 +44,7 @@ RESOURCE_HANDLE(Shader);
 struct ShaderCode {
     std::vector<uint32_t> code;
     FileHandle source_file;
+    ShaderTypeFlags flags;
 };
 
 struct ShaderParameter {
@@ -72,21 +86,33 @@ class Shader : public DResource<ShaderHandle> {
         return _attributes;
     }
 
-    void addCodeFile(FileHandle file, ShaderTypes shader_type) {
-        _codes[to_underlying(shader_type)] = {{}, file};
+    // all code related
+    int appendCodeFile(FileHandle file, ShaderTypeFlags flags = ShaderTypeFlags::NONE) {
+        ShaderCode code{};
+        code.flags = flags;
+        code.source_file = file;
+        _codes.push_back(code);
+        return _codes.size() - 1;
     }
 
-    void setByteCode(const std::vector<uint32_t>& code,
-                     ShaderTypes shader_type) {
-        _codes[to_underlying(shader_type)].code = code;
+    void setByteCode(int idx, const std::vector<uint32_t>& code) {
+        _codes[idx].code = code;
     }
 
-    const std::vector<uint32_t>& getCode(ShaderTypes shader_type) const {
-        return _codes[to_underlying(shader_type)].code;
+    void setCodeTypeFlags(int idx, ShaderTypeFlags flags) {
+        _codes[idx].flags = _codes[idx].flags | flags;
     }
 
-    FileHandle getCodeFile(ShaderTypes shader_type) const {
-        return _codes[to_underlying(shader_type)].source_file;
+    const std::vector<uint32_t>& getByteCode(int idx) const {
+        return _codes[idx].code;
+    }
+
+    FileHandle getCodeFile(int idx) const {
+        return _codes[idx].source_file;
+    }
+
+    const std::vector<ShaderCode>& getCodes() {
+        return _codes;
     }
 
     PrimitiveInterpretation topology = PrimitiveInterpretation::TRIANGLES;
@@ -95,7 +121,7 @@ class Shader : public DResource<ShaderHandle> {
    private:
     std::vector<ShaderParameter> _parameters;
     std::map<uint, AttributeTypes> _attributes;
-    std::array<ShaderCode, to_underlying(ShaderTypes::_MAX)> _codes;
+    std::vector<ShaderCode> _codes;
 };
 
 RESOURCE_MANAGER(Shader);
