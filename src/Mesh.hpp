@@ -42,7 +42,7 @@ class Mesh : public DResource<MeshHandle> {
     template <AttributeTypes I>
     attr_vt_alt<I>& createAttribute(uint location) {
         auto it = _attributes.lower_bound(location);
-        if(it == _attributes.end() or it->first != location)
+        if (it == _attributes.end() or it->first != location)
             it = _attributes.insert(it, {location, attr_vt_alt<I>(_nvertices)});
         return std::get<to_underlying(I)>(it->second);
     }

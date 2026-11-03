@@ -9,23 +9,22 @@ class Hive {
    public:
     Hive(size_t chunk_size = 64) : _chunk_size(chunk_size) {};
 
-    size_t push_back(T&& value) {
-        if (_size >= _chunk_size * _blocks.size()) {
-            _blocks.push_back(std::make_unique<T[]>(_chunk_size));
+    // WARN: Call destructors?
+    ~Hive() {
+        for (T* p : _blocks) {
+            _alloc.deallocate(p, _chunk_size);
         }
-        int block = _size / _chunk_size;
-        int idx = _size % _chunk_size;
-        _blocks[block][idx] = std::move(value);
-        return _size++;
     }
 
-    size_t push_back(const T& value) {
+    size_t push_back(T&& value) {
         if (_size >= _chunk_size * _blocks.size()) {
-            _blocks.push_back(std::make_unique<T[]>(_chunk_size));
+            T* new_ptr = _alloc.allocate(_chunk_size);
+            _blocks.push_back(new_ptr);
         }
         int block = _size / _chunk_size;
         int idx = _size % _chunk_size;
-        _blocks[block][idx] = value;
+        std::allocator_traits<decltype(_alloc)>::construct(
+            _alloc, &_blocks[block][idx], std::move(value));
         return _size++;
     }
 
@@ -56,12 +55,20 @@ class Hive {
         blocks += (diff % _chunk_size > 0);
         _blocks.reserve(blocks);
         for (size_t i = 0; i < blocks; i++) {
-            _blocks.push_back(std::make_unique<T[]>(_chunk_size));
+            T* new_ptr = _alloc.allocate(_chunk_size);
+            _blocks.push_back(new_ptr);
         }
     }
 
     void resize(size_t size) {
-        reserve(size);
+        if (size > _size) {
+            reserve(size);
+            for (int i = _size; i < size; i++) {
+                size_t block = i / _chunk_size;
+                size_t idx = i % _chunk_size;
+                _blocks[block][idx] = T();
+            }
+        }
         _size = size;
     }
 
@@ -97,5 +104,6 @@ class Hive {
    private:
     const int _chunk_size;
     int _size = 0;
-    std::vector<std::unique_ptr<T[]>> _blocks;
+    std::allocator<T> _alloc;
+    std::vector<T*> _blocks;
 };

@@ -7,6 +7,7 @@
 namespace gbg {
 
 inline void setParametersFromShader(Shader& shader, Material& mat) {
+    mat.setShader(shader.getHandle());
     auto& vals = mat.getValues();
     for (auto [idx, parm] : shader.getParameters() | std::views::enumerate) {
         if (idx >= vals.size()) {

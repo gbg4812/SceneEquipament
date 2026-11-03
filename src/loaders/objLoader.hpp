@@ -22,10 +22,12 @@
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
 #include "Material.hpp"
+#include "MaterialFunctions.hpp"
+#include "Shader.hpp"
 #include "Texture.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
-#include "texLoader.hpp"
 #include "glm/gtx/hash.hpp"
+#include "texLoader.hpp"
 
 namespace gbg {
 
@@ -67,6 +69,7 @@ struct _parser_context {
     gbg::MaterialHandle current_mat = gbg::MaterialHandle();
     std::map<std::string, gbg::MaterialHandle> materials;
     std::map<std::string, gbg::TextureHandle> textures;
+    gbg::ShaderHandle base_shader;
 };
 
 inline void parseVertexPos(const std::string& line, Mesh& mesh,
@@ -162,9 +165,15 @@ inline void parseLine(const std::string& line, Mesh& mesh,
  * texture albedo;
  * texture bump;
  */
-inline void parseMaterials(const std::string& path, _parser_context& context,
-                           gbg::Scene& scene) {
+inline void parseMaterials(const std::filesystem::path& path,
+                           _parser_context& context, gbg::Scene& scene) {
     std::ifstream f(path);
+
+    static const std::regex tex_rg(
+        "map_((kd)|(bump))(\\s*-bm\\s([\\d\\.]*))*\\s*([\\w/\\.]+)",
+        std::regex::icase);
+
+    std::smatch m;
 
     std::string line;
     gbg::MaterialHandle mat_h = {};
@@ -176,6 +185,8 @@ inline void parseMaterials(const std::string& path, _parser_context& context,
             std::string name;
             ss >> name;
             auto& mat = scene.mat_mg.create(name);
+            auto& sh = scene.sh_mg.get(context.base_shader);
+            gbg::setParametersFromShader(sh, mat);
             context.materials[name] = mat.getHandle();
             mat_h = mat.getHandle();
         } else if (type == "Ka") {
@@ -199,76 +210,69 @@ inline void parseMaterials(const std::string& path, _parser_context& context,
             float val;
             ss >> val;
             mat.setParameter(3, val);
-        } else if (type == "map_Kd") {
+        } else if (std::regex_match(line, m, tex_rg)) {
             auto& mat = scene.mat_mg.get(mat_h);
-            std::string path;
-            ss >> path;
-            auto it = context.textures.find(path);
+            std::string _path = m[6].str();
+
+            auto it = context.textures.find(_path);
             if (it == context.textures.end()) {
-                auto& tx = scene.tx_mg.create(path);
-                loadTexture(path, tx);
-                it = context.textures.insert({path, tx.getHandle()}).first;
-            } 
-            mat.setParameter(4, it->second);
-        } else if (type == "map_bump") {
-            auto& mat = scene.mat_mg.get(mat_h);
-            std::string path;
-            ss >> path;
-            auto it = context.textures.find(path);
-            if (it == context.textures.end()) {
-                auto& tx = scene.tx_mg.create(path);
-                loadTexture(path, tx);
-                it = context.textures.insert({path, tx.getHandle()}).first;
-            } 
-            mat.setParameter(5, it->second);
+                auto& tx = scene.tx_mg.create(_path);
+                loadTexture((path.parent_path() / _path).string(), tx);
+                it = context.textures.insert({_path, tx.getHandle()}).first;
+            }
+            if (m[2].matched) mat.setParameter(4, it->second);
+            if (m[3].matched) mat.setParameter(5, it->second);
         }
     }
+}
 
-    /* Loads all the models in a .obj file and hangs them from the parent
-     * @return a list of handles to all the scene nodes added
-     */
-    inline std::list<SceneTreeHandle> objLoader(
-        std::string path, Scene * scene, SceneTreeHandle parent,
-        MaterialHandle default_mat, ShaderHandle shader_h) {
-        std::map<std::string,
-                 void (*)(const std::string&, Mesh&, _parser_context& context)>
-            dispatch;
-        dispatch["v"] = parseVertexPos;
-        dispatch["vn"] = parseVertexNormal;
-        dispatch["vt"] = parseVertexUV;
-        dispatch["f"] = parseFace;
-        dispatch["l"] = parseLine;
+/* Loads all the models in a .obj file and hangs them from the parent
+ * @return a list of handles to all the scene nodes added
+ */
+inline std::list<SceneTreeHandle> objLoader(
+    std::filesystem::path path, Scene* scene, SceneTreeHandle parent,
+    ShaderHandle base_shader, MaterialHandle default_mat = MaterialHandle()) {
+    std::map<std::string,
+             void (*)(const std::string&, Mesh&, _parser_context& context)>
+        dispatch;
+    dispatch["v"] = parseVertexPos;
+    dispatch["vn"] = parseVertexNormal;
+    dispatch["vt"] = parseVertexUV;
+    dispatch["f"] = parseFace;
+    dispatch["l"] = parseLine;
 
-        std::ifstream fs(path);
-        if (fs.fail()) return std::list<SceneTreeHandle>();
+    std::ifstream fs(path);
+    if (fs.fail()) return std::list<SceneTreeHandle>();
 
-        auto& md_mg = scene->getModelManager();
-        auto& ms_mg = scene->getMeshManager();
-        auto& st_mg = scene->getSceneTreeManager();
+    auto& md_mg = scene->getModelManager();
+    auto& ms_mg = scene->getMeshManager();
+    auto& st_mg = scene->getSceneTreeManager();
 
-        MeshHandle ms_h;
+    MeshHandle ms_h;
 
-        std::list<SceneTreeHandle> added;
+    std::list<SceneTreeHandle> added;
 
-        std::string line;
-        _parser_context context{};
-        context.current_mat = default_mat;
-        while (std::getline(fs, line)) {
-            std::string type;
-            std::stringstream ss(line);
-            ss >> type;
+    std::string line;
+    _parser_context context{};
+    context.current_mat = default_mat;
+    context.base_shader = base_shader;
+    while (std::getline(fs, line)) {
+        std::string type;
+        std::stringstream ss(line);
+        ss >> type;
 
-            if (type == "mtllib") {
-                std::string mtllib_pt;
-                ss >> mtllib_pt;
-                parseMaterials(mtllib_pt, context);
+        if (type == "mtllib") {
+            std::string mtllib_pt;
+            ss >> mtllib_pt;
+            parseMaterials(path.parent_path() / mtllib_pt, context, *scene);
 
-            } else if (type == "o" or type == "usemtl") {
-                std::string name;
-                ss >> name;
-                if (type == "usemtl") {
-                    context.current_mat = context.materials[name];
-                }
+        } else if (type == "o" or type == "usemtl") {
+            std::string name;
+            ss >> name;
+            if (type == "usemtl") {
+                context.current_mat = context.materials[name];
+            }
+            if (type == "o" or not ms_h) {
                 auto& md = md_mg.create(name);
                 auto& child = st_mg.create(name);
                 added.push_back(child.getHandle());
@@ -284,16 +288,17 @@ inline void parseMaterials(const std::string& path, _parser_context& context,
                 ms.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
 
                 context.vertices.clear();
+            }
 
-            } else if (ms_h) {
-                Mesh& ms = ms_mg.get(ms_h);
-                auto it = dispatch.find(type);
-                if (it != dispatch.end()) {
-                    (*it).second(line, ms, context);
-                }
+        } else if (ms_h) {
+            Mesh& ms = ms_mg.get(ms_h);
+            auto it = dispatch.find(type);
+            if (it != dispatch.end()) {
+                (*it).second(line, ms, context);
             }
         }
-        return added;
     }
+    return added;
+}
 
 }  // namespace gbg

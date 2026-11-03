@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "Material.hpp"
+#include "MaterialFunctions.hpp"
 #include "Mesh.hpp"
 #include "SceneTree.hpp"
+#include "Texture.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include "loaders/objLoader.hpp"
@@ -45,24 +47,41 @@ TEST(loader_tests, loader_load) {
     Scene sc;
 
     auto& mt_mg = sc.getMaterialManager();
+    auto& sh_mg = sc.getShaderManager();
     auto& md_mg = sc.getModelManager();
     auto& ms_mg = sc.getMeshManager();
     auto& st_mg = sc.getSceneTreeManager();
 
     SceneTreeHandle parent = st_mg.create("Root").getRID();
 
-    MaterialHandle mth = mt_mg.create("Default Material").getRID();
+    auto& mt = mt_mg.create("Default Material");
+    auto& sh = sh_mg.create("Default Shader");
+    /**
+     * Material parameters:
+     * vec3 ambient_color;
+     * vec3 diffuse_color;
+     * vec3 specular_color;
+     * float specular_exponent;
+     * texture albedo;
+     * texture bump;
+     */
+    sh.addParameter(vec3_t(0.1, 0.1, 0.1));
+    sh.addParameter(vec3_t(1, 1, 1));
+    sh.addParameter(vec3_t(1, 1, 1));
+    sh.addParameter(100.0f);
+    sh.addParameter(TextureHandle());
+    sh.addParameter(TextureHandle());
+    gbg::setParametersFromShader(sh, mt);
 
-    objLoader("./data/Cube.obj", &sc, parent, mth);
+    objLoader("./data/Cube.obj", &sc, parent, sh.getHandle(), mt.getHandle());
 
     ASSERT_EQ(md_mg.begin()->getName(), "Cube");
 
     ASSERT_EQ(md_mg.begin()->getMesh(), ms_mg.begin()->getHandle());
-    ASSERT_EQ(md_mg.begin()->getMaterial(), mth);
 
-    ASSERT_EQ(
-        ms_mg.begin()->getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0).size(),
-        24);
+    auto& msh = *ms_mg.begin();
+
+    ASSERT_EQ(msh.getAttribute<gbg::AttributeTypes::VEC3_ATTR>(0).size(), 24);
 }
 
 TEST(loader_tests, loader_stress) {
@@ -77,7 +96,11 @@ TEST(loader_tests, loader_stress) {
     auto& parent = st_mg.create("Root");
 
     auto& mt = mt_mg.create("Default Material");
+    auto& sh = sc.sh_mg.create("Default Shader");
 
     objLoader("./data/sponza/sponza.obj", &sc, parent.getHandle(),
-              mt.getHandle());
+              sh.getHandle(), mt.getHandle());
+
+    ASSERT_EQ(ms_mg.begin()->getAttribute<AttributeTypes::VEC3_ATTR>(0).size(),
+              184603);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "DResource.hpp"
 #include "Shader.hpp"
 #include "macros.hpp"
@@ -29,10 +31,11 @@ class Material : public DResource<MaterialHandle> {
 
     template <ParameterTypes I>
     void setParameterValue(size_t pos, parm_vt_alt<I> value) {
-        _parameters.at(pos) = value;
+        setParameter(value);
     }
 
     void setParameter(size_t pos, parm_vt value) {
+        assert(_parameters.size() > pos);
         _parameters.at(pos) = value;
     }
 
