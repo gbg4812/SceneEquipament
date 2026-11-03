@@ -10,6 +10,8 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <istream>
+#include <map>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -19,7 +21,10 @@
 #include "../Model.hpp"
 #include "../Scene.hpp"
 #include "../SceneTree.hpp"
+#include "Material.hpp"
+#include "Texture.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
+#include "texLoader.hpp"
 #include "glm/gtx/hash.hpp"
 
 namespace gbg {
@@ -59,6 +64,9 @@ struct _parser_context {
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> uvs;
     std::unordered_map<_parser_vertex, size_t> vertices;
+    gbg::MaterialHandle current_mat = gbg::MaterialHandle();
+    std::map<std::string, gbg::MaterialHandle> materials;
+    std::map<std::string, gbg::TextureHandle> textures;
 };
 
 inline void parseVertexPos(const std::string& line, Mesh& mesh,
@@ -145,67 +153,147 @@ inline void parseLine(const std::string& line, Mesh& mesh,
     mesh.createFace(face);
 }
 
-/* Loads all the models in a .obj file and hangs them from the parent
- * @return a list of handles to all the scene nodes added
+/**
+ * Material parameters:
+ * vec3 ambient_color;
+ * vec3 diffuse_color;
+ * vec3 specular_color;
+ * float specular_exponent;
+ * texture albedo;
+ * texture bump;
  */
-inline std::list<SceneTreeHandle> objLoader(std::string path, Scene* scene,
-                                            SceneTreeHandle parent,
-                                            MaterialHandle default_mat) {
-    std::map<std::string,
-             void (*)(const std::string&, Mesh&, _parser_context& context)>
-        dispatch;
-    dispatch["v"] = parseVertexPos;
-    dispatch["vn"] = parseVertexNormal;
-    dispatch["vt"] = parseVertexUV;
-    dispatch["f"] = parseFace;
-    dispatch["l"] = parseLine;
-
-    std::ifstream fs(path);
-    if (fs.fail()) return std::list<SceneTreeHandle>();
-
-    auto& md_mg = scene->getModelManager();
-    auto& ms_mg = scene->getMeshManager();
-    auto& st_mg = scene->getSceneTreeManager();
-
-    MeshHandle ms_h;
-
-    std::list<SceneTreeHandle> added;
+inline void parseMaterials(const std::string& path, _parser_context& context,
+                           gbg::Scene& scene) {
+    std::ifstream f(path);
 
     std::string line;
-    _parser_context context{};
-    while (std::getline(fs, line)) {
-        std::string type;
+    gbg::MaterialHandle mat_h = {};
+    while (std::getline(f, line)) {
         std::stringstream ss(line);
+        std::string type;
         ss >> type;
-
-        if (type == "o") {
+        if (type == "newmtl") {
             std::string name;
             ss >> name;
-            auto& md = md_mg.create(name);
-            auto& child = st_mg.create(name);
-            added.push_back(child.getHandle());
-            child.setResource(md.getHandle());
-            st_mg.prependChild(parent, child.getHandle());
-            auto& ms = ms_mg.create("Mesh0");
-            ms_h = ms.getHandle();
+            auto& mat = scene.mat_mg.create(name);
+            context.materials[name] = mat.getHandle();
+            mat_h = mat.getHandle();
+        } else if (type == "Ka") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            vec3_t val;
+            ss >> val.x >> val.y >> val.z;
+            mat.setParameter(0, val);
+        } else if (type == "Kd") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            vec3_t val;
+            ss >> val.x >> val.y >> val.z;
+            mat.setParameter(1, val);
+        } else if (type == "Ks") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            vec3_t val;
+            ss >> val.x >> val.y >> val.z;
+            mat.setParameter(2, val);
 
-            md.setMesh(ms.getHandle());
-            md.setMaterial(default_mat);
-            ms.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
-            ms.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
-            ms.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
-
-            context.vertices.clear();
-
-        } else if (ms_h) {
-            Mesh& ms = ms_mg.get(ms_h);
-            auto it = dispatch.find(type);
-            if (it != dispatch.end()) {
-                (*it).second(line, ms, context);
-            }
+        } else if (type == "Ns") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            float val;
+            ss >> val;
+            mat.setParameter(3, val);
+        } else if (type == "map_Kd") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            std::string path;
+            ss >> path;
+            auto it = context.textures.find(path);
+            if (it == context.textures.end()) {
+                auto& tx = scene.tx_mg.create(path);
+                loadTexture(path, tx);
+                it = context.textures.insert({path, tx.getHandle()}).first;
+            } 
+            mat.setParameter(4, it->second);
+        } else if (type == "map_bump") {
+            auto& mat = scene.mat_mg.get(mat_h);
+            std::string path;
+            ss >> path;
+            auto it = context.textures.find(path);
+            if (it == context.textures.end()) {
+                auto& tx = scene.tx_mg.create(path);
+                loadTexture(path, tx);
+                it = context.textures.insert({path, tx.getHandle()}).first;
+            } 
+            mat.setParameter(5, it->second);
         }
     }
-    return added;
-}
+
+    /* Loads all the models in a .obj file and hangs them from the parent
+     * @return a list of handles to all the scene nodes added
+     */
+    inline std::list<SceneTreeHandle> objLoader(
+        std::string path, Scene * scene, SceneTreeHandle parent,
+        MaterialHandle default_mat, ShaderHandle shader_h) {
+        std::map<std::string,
+                 void (*)(const std::string&, Mesh&, _parser_context& context)>
+            dispatch;
+        dispatch["v"] = parseVertexPos;
+        dispatch["vn"] = parseVertexNormal;
+        dispatch["vt"] = parseVertexUV;
+        dispatch["f"] = parseFace;
+        dispatch["l"] = parseLine;
+
+        std::ifstream fs(path);
+        if (fs.fail()) return std::list<SceneTreeHandle>();
+
+        auto& md_mg = scene->getModelManager();
+        auto& ms_mg = scene->getMeshManager();
+        auto& st_mg = scene->getSceneTreeManager();
+
+        MeshHandle ms_h;
+
+        std::list<SceneTreeHandle> added;
+
+        std::string line;
+        _parser_context context{};
+        context.current_mat = default_mat;
+        while (std::getline(fs, line)) {
+            std::string type;
+            std::stringstream ss(line);
+            ss >> type;
+
+            if (type == "mtllib") {
+                std::string mtllib_pt;
+                ss >> mtllib_pt;
+                parseMaterials(mtllib_pt, context);
+
+            } else if (type == "o" or type == "usemtl") {
+                std::string name;
+                ss >> name;
+                if (type == "usemtl") {
+                    context.current_mat = context.materials[name];
+                }
+                auto& md = md_mg.create(name);
+                auto& child = st_mg.create(name);
+                added.push_back(child.getHandle());
+                child.setResource(md.getHandle());
+                st_mg.prependChild(parent, child.getHandle());
+                auto& ms = ms_mg.create("Mesh0");
+                ms_h = ms.getHandle();
+
+                md.setMesh(ms.getHandle());
+                md.setMaterial(default_mat);
+                ms.createAttribute<AttributeTypes::VEC3_ATTR>(0);  // position
+                ms.createAttribute<AttributeTypes::VEC3_ATTR>(1);  // normal
+                ms.createAttribute<AttributeTypes::VEC2_ATTR>(2);  // texture
+
+                context.vertices.clear();
+
+            } else if (ms_h) {
+                Mesh& ms = ms_mg.get(ms_h);
+                auto it = dispatch.find(type);
+                if (it != dispatch.end()) {
+                    (*it).second(line, ms, context);
+                }
+            }
+        }
+        return added;
+    }
 
 }  // namespace gbg
