@@ -11,6 +11,9 @@ class Hive {
 
     // WARN: Call destructors?
     ~Hive() {
+        for (int i = 0; i < _size; i++) {
+            this->at(i).~T();
+        }
         for (T* p : _blocks) {
             _alloc.deallocate(p, _chunk_size);
         }
@@ -66,7 +69,8 @@ class Hive {
             for (int i = _size; i < size; i++) {
                 size_t block = i / _chunk_size;
                 size_t idx = i % _chunk_size;
-                _blocks[block][idx] = T();
+                std::allocator_traits<decltype(_alloc)>::construct(
+                    _alloc, &_blocks[block][idx]);
             }
         }
         _size = size;

@@ -10,13 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-file(GLOB SRC src/*.hpp)
+file(GLOB SRC src/*.hpp src/*.cpp src/loaders/*.cpp)
 
-add_library(${PROJECT_NAME} INTERFACE
+add_library(${PROJECT_NAME} STATIC
     ${SRC}
 )
 
-target_include_directories(${PROJECT_NAME} INTERFACE src/)
+target_include_directories(${PROJECT_NAME} PUBLIC src/)
 
 
 FetchContent_Declare(
@@ -41,8 +41,8 @@ FetchContent_MakeAvailable(tracy)
 
 
 
-target_link_libraries(${PROJECT_NAME} INTERFACE glm::glm)
-target_link_libraries(${PROJECT_NAME} INTERFACE TracyClient)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+target_link_libraries(${PROJECT_NAME} PRIVATE TracyClient)
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     FetchContent_Declare(
