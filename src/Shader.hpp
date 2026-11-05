@@ -29,10 +29,12 @@ enum class ShaderTypeFlags {
     _MAX
 };
 
-inline ShaderTypeFlags operator&(ShaderTypeFlags flags1, ShaderTypeFlags flags2) {
+inline ShaderTypeFlags operator&(ShaderTypeFlags flags1,
+                                 ShaderTypeFlags flags2) {
     return (ShaderTypeFlags)(to_underlying(flags1) & to_underlying(flags2));
 }
-inline ShaderTypeFlags operator|(ShaderTypeFlags flags1, ShaderTypeFlags flags2) {
+inline ShaderTypeFlags operator|(ShaderTypeFlags flags1,
+                                 ShaderTypeFlags flags2) {
     return (ShaderTypeFlags)(to_underlying(flags1) | to_underlying(flags2));
 }
 
@@ -87,7 +89,8 @@ class Shader : public DResource<ShaderHandle> {
     }
 
     // all code related
-    int appendCodeFile(FileHandle file, ShaderTypeFlags flags = ShaderTypeFlags::NONE) {
+    int appendCodeFile(FileHandle file,
+                       ShaderTypeFlags flags = ShaderTypeFlags::NONE) {
         ShaderCode code{};
         code.flags = flags;
         code.source_file = file;
@@ -107,12 +110,17 @@ class Shader : public DResource<ShaderHandle> {
         return _codes[idx].code;
     }
 
-    FileHandle getCodeFile(int idx) const {
-        return _codes[idx].source_file;
-    }
+    FileHandle getCodeFile(int idx) const { return _codes[idx].source_file; }
 
-    const std::vector<ShaderCode>& getCodes() {
-        return _codes;
+    const std::vector<ShaderCode>& getCodes() { return _codes; }
+
+    bool isValid() {
+        for (auto& code : _codes) {
+            if (code.code.empty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     PrimitiveInterpretation topology = PrimitiveInterpretation::TRIANGLES;

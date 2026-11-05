@@ -2,8 +2,8 @@
 #include <filesystem>
 
 #include "../DResource.hpp"
+#include "../Resource.hpp"
 #include "../macros.hpp"
-#include "Resource.hpp"
 
 namespace gbg {
 namespace fsys = std::filesystem;
