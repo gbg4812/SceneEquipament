@@ -73,7 +73,7 @@ TEST(loader_tests, loader_load) {
     sh.addParameter(TextureHandle());
     gbg::setParametersFromShader(sh, mt);
 
-    objLoader("./data/Cube.obj", &sc, parent, sh.getHandle(), mt.getHandle());
+    objLoadMeshes("./data/Cube.obj", &sc, parent, {});
 
     ASSERT_EQ(md_mg.begin()->getName(), "Cube");
 
@@ -98,8 +98,7 @@ TEST(loader_tests, loader_stress) {
     auto& mt = mt_mg.create("Default Material");
     auto& sh = sc.sh_mg.create("Default Shader");
 
-    objLoader("./data/sponza/sponza.obj", &sc, parent.getHandle(),
-              sh.getHandle(), mt.getHandle());
+    objLoadMeshes("./data/sponza/sponza.obj", &sc, parent.getHandle(), {});
 
     ASSERT_EQ(ms_mg.begin()->getAttribute<AttributeTypes::VEC3_ATTR>(0).size(),
               184603);
