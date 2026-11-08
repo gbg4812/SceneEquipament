@@ -7,6 +7,7 @@
 
 #include <sys/types.h>
 
+#include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -70,8 +71,7 @@ struct _parser_context {
     std::map<std::string, gbg::MaterialHandle> materials;
 };
 
-inline void parseVertexPos(const std::string& line, Mesh& mesh,
-                           _parser_context& context) {
+inline void parseVertexPos(const std::string& line, _parser_context& context) {
     char c;
     float x, y, z;
     std::stringstream ss(line);
@@ -79,7 +79,7 @@ inline void parseVertexPos(const std::string& line, Mesh& mesh,
     context.positions.push_back(glm::vec3(x, y, z));
 }
 
-inline void parseVertexNormal(const std::string& line, Mesh& mesh,
+inline void parseVertexNormal(const std::string& line,
                               _parser_context& context) {
     char c;
     float x, y, z;
@@ -88,8 +88,7 @@ inline void parseVertexNormal(const std::string& line, Mesh& mesh,
     context.normals.push_back(glm::vec3(x, y, z));
 }
 
-inline void parseVertexUV(const std::string& line, Mesh& mesh,
-                          _parser_context& context) {
+inline void parseVertexUV(const std::string& line, _parser_context& context) {
     char c;
     float x, y;
     std::stringstream ss(line);
@@ -170,7 +169,7 @@ objLoadMaterials(const std::filesystem::path& path, gbg::Scene& scene,
     std::ifstream f(path);
 
     static const std::regex tex_rg(
-        "map_((kd)|(bump))(\\s*-bm\\s([\\d\\.]*))*\\s*([\\w/\\.]+)",
+        "\\s*map_((kd)|(bump))(\\s*-bm\\s([\\d\\.]*))*\\s*([\\w\\\\/\\.]+)",
         std::regex::icase);
 
     std::smatch m;
@@ -219,7 +218,9 @@ objLoadMaterials(const std::filesystem::path& path, gbg::Scene& scene,
             auto it = textures.find(_path);
             if (it == textures.end()) {
                 auto& tx = scene.tx_mg.create(_path);
-                auto pt = (path.parent_path() / _path).string();
+                std::replace(_path.begin(), _path.end(), '\\', '/');
+                auto pt = (path.parent_path() / _path).native();
+                if (m[3].matched) tx.raw = true;
                 loadTexture(pt, tx);
                 it = textures.insert({_path, tx.getHandle()}).first;
             }
@@ -238,13 +239,17 @@ inline std::list<SceneTreeHandle> objLoadMeshes(
     std::filesystem::path path, Scene* scene, SceneTreeHandle parent,
     std::map<std::string, MaterialHandle> materials) {
     std::map<std::string,
+             void (*)(const std::string&, _parser_context& context)>
+        dispatch_vertices;
+    std::map<std::string,
              void (*)(const std::string&, Mesh&, _parser_context& context)>
-        dispatch;
-    dispatch["v"] = parseVertexPos;
-    dispatch["vn"] = parseVertexNormal;
-    dispatch["vt"] = parseVertexUV;
-    dispatch["f"] = parseFace;
-    dispatch["l"] = parseLine;
+        dispatch_primitives;
+    dispatch_vertices["v"] = parseVertexPos;
+    dispatch_vertices["vn"] = parseVertexNormal;
+    dispatch_vertices["vt"] = parseVertexUV;
+
+    dispatch_primitives["f"] = parseFace;
+    dispatch_primitives["l"] = parseLine;
 
     std::ifstream fs(path);
     if (fs.fail()) return std::list<SceneTreeHandle>();
@@ -253,11 +258,11 @@ inline std::list<SceneTreeHandle> objLoadMeshes(
     auto& ms_mg = scene->getMeshManager();
     auto& st_mg = scene->getSceneTreeManager();
 
-    MeshHandle ms_h;
-
     std::list<SceneTreeHandle> added;
 
     std::string line;
+    bool first_m_after_o = false;
+    ModelHandle md_h;
     _parser_context context{};
     context.current_mat = scene->defaults.material;
     context.materials = materials;
@@ -270,16 +275,26 @@ inline std::list<SceneTreeHandle> objLoadMeshes(
             std::string name;
             ss >> name;
             if (type == "usemtl") {
-                context.current_mat = context.materials[name];
+                auto it = context.materials.find(name);
+                if (it != context.materials.end())
+                    context.current_mat = context.materials.at(name);
+                else
+                    context.current_mat = scene->defaults.material;
+                if (first_m_after_o)
+                    md_mg.get(md_h).setMaterial(context.current_mat);
             }
-            if (type == "o" or not ms_h) {
+            if (type == "o" or not first_m_after_o) {
+                if (type != "o")
+                    first_m_after_o = false;
+                else
+                    first_m_after_o = true;
                 auto& md = md_mg.create(name);
                 auto& child = st_mg.create(name);
                 added.push_back(child.getHandle());
                 child.setResource(md.getHandle());
                 st_mg.prependChild(parent, child.getHandle());
                 auto& ms = ms_mg.create("Mesh0");
-                ms_h = ms.getHandle();
+                md_h = md.getHandle();
 
                 md.setMesh(ms.getHandle());
                 md.setMaterial(context.current_mat);
@@ -289,12 +304,16 @@ inline std::list<SceneTreeHandle> objLoadMeshes(
 
                 context.vertices.clear();
             }
-
-        } else if (ms_h) {
-            Mesh& ms = ms_mg.get(ms_h);
-            auto it = dispatch.find(type);
-            if (it != dispatch.end()) {
-                (*it).second(line, ms, context);
+        }
+        auto itv = dispatch_vertices.find(type);
+        if (itv != dispatch_vertices.end()) {
+            itv->second(line, context);
+        } else {
+            auto itp = dispatch_primitives.find(type);
+            if (itp != dispatch_primitives.end()) {
+                Model& md = md_mg.get(md_h);
+                Mesh& ms = ms_mg.get(md.getMesh());
+                itp->second(line, ms, context);
             }
         }
     }

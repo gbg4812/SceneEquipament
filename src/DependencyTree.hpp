@@ -99,10 +99,12 @@ class DependencyTreeManager
                 auto& n = get(*ord_it);
                 for (auto& [dh, vis] : n.dependents) {
                     auto& dn = get(dh.dependent);
-                    dn.modifiedParents -= vis;
-                    vis = 0;
-                    if (dn.modifiedParents == 0) {
-                        _ordered.push_back(dh.dependent);
+                    if(dh.mask_pre & n.flags) {
+                        dn.modifiedParents -= vis;
+                        vis = 0;
+                        if (dn.modifiedParents == 0) {
+                            _ordered.push_back(dh.dependent);
+                        }
                     }
                 }
                 ++ord_it;
