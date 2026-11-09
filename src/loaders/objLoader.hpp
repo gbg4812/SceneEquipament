@@ -234,11 +234,11 @@ inline std::expected<ObjLoaderMaterialsResult, std::string> objLoadMaterials(
                 it = textures.insert({_path, tx.getHandle()}).first;
             }
             if (m[2].matched) {
-                mat.setParameter(6, it->second);
+                mat.setParameter(7, it->second);
                 mat.setParameter(4, true);
             }
             if (m[3].matched) {
-                mat.setParameter(7, it->second);
+                mat.setParameter(8, it->second);
                 mat.setParameter(5, true);
             }
         }
