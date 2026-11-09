@@ -8,6 +8,7 @@
 #include <sys/types.h>
 
 #include <algorithm>
+#include <expected>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -162,10 +163,16 @@ inline void parseLine(const std::string& line, Mesh& mesh,
  * texture albedo;
  * texture bump;
  */
-inline std::pair<std::map<std::string, MaterialHandle>,
-                 std::map<std::string, TextureHandle>>
-objLoadMaterials(const std::filesystem::path& path, gbg::Scene& scene,
-                 ShaderHandle base_shader) {
+
+struct ObjLoaderMaterialsResult {
+    std::map<std::string, MaterialHandle> materials;
+    std::map<std::string, TextureHandle> textures;
+    std::string diagnostics;
+};
+
+inline std::expected<ObjLoaderMaterialsResult, std::string> objLoadMaterials(
+    const std::filesystem::path& path, gbg::Scene& scene,
+    ShaderHandle base_shader) {
     std::ifstream f(path);
 
     static const std::regex tex_rg(
@@ -173,6 +180,7 @@ objLoadMaterials(const std::filesystem::path& path, gbg::Scene& scene,
         std::regex::icase);
 
     std::smatch m;
+    std::stringstream diagnostics;
 
     std::string line;
     gbg::MaterialHandle mat_h = {};
@@ -221,15 +229,22 @@ objLoadMaterials(const std::filesystem::path& path, gbg::Scene& scene,
                 std::replace(_path.begin(), _path.end(), '\\', '/');
                 auto pt = (path.parent_path() / _path).native();
                 if (m[3].matched) tx.raw = true;
-                loadTexture(pt, tx);
+                auto res = loadTexture(pt, tx);
+                if (not res) diagnostics << res.error() << std::endl;
                 it = textures.insert({_path, tx.getHandle()}).first;
             }
-            if (m[2].matched) mat.setParameter(4, it->second);
-            if (m[3].matched) mat.setParameter(5, it->second);
+            if (m[2].matched) {
+                mat.setParameter(6, it->second);
+                mat.setParameter(4, true);
+            }
+            if (m[3].matched) {
+                mat.setParameter(7, it->second);
+                mat.setParameter(5, true);
+            }
         }
     }
 
-    return {materials, textures};
+    return ObjLoaderMaterialsResult{materials, textures, diagnostics.str()};
 }
 
 /* Loads all the models in a .obj file and hangs them from the parent

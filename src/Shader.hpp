@@ -12,12 +12,12 @@
 #include "macros.hpp"
 
 namespace gbg {
-typedef std::variant<int32_t, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
+typedef std::variant<int32_t, bool, float_t, vec2_t, vec3_t, TextureHandle> parm_vt;
 
-enum class ParameterTypes { INT, FLOAT, VEC2, VEC3, TEXTURE, _MAX };
+enum class ParameterTypes { INT, BOOL, FLOAT, VEC2, VEC3, TEXTURE, _MAX };
 
 inline std::array<std::string_view, to_underlying(ParameterTypes::_MAX)>
-    parmTypeToString = {"int", "float", "vec2", "vec3", "texture"};
+    parmTypeToString = {"int", "bool", "float", "vec2", "vec3", "texture"};
 
 enum class PrimitiveInterpretation { TRIANGLES, POINTS, LINES, _MAX };
 
