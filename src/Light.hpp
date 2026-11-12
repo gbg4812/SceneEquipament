@@ -7,10 +7,11 @@ namespace gbg {
 enum class LightType {
     SPOT=0,
     DIRECTIONAL,
+    AMBIENT,
     _MAX,
 };
 
-const std::map<LightType, std::string_view> light_tToStr = {{LightType::SPOT, "Spot"}, {LightType::DIRECTIONAL, "Directional"}};
+const std::map<LightType, std::string_view> light_tToStr = {{LightType::SPOT, "Spot"}, {LightType::DIRECTIONAL, "Directional"}, {LightType::AMBIENT, "Ambient"}};
 
 RESOURCE_HANDLE(Light);
 

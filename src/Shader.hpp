@@ -124,7 +124,8 @@ class Shader : public DResource<ShaderHandle> {
     }
 
     PrimitiveInterpretation topology = PrimitiveInterpretation::TRIANGLES;
-    bool shadow = true;
+    bool casts_shadow = true;
+    bool is_transmisive = false;
 
    private:
     std::vector<ShaderParameter> _parameters;
